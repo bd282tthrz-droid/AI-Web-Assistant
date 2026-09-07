@@ -1,0 +1,14 @@
+/* HeroUI 组件样式入口（通过相对路径导入 node_modules 中的 CSS 文件）
+   @import "tailwindcss" 的 TailwindCSS v4 特殊语法由 @tailwindcss/vite 插件处理 */
+@import "../../node_modules/@heroui/styles/dist/index.css";
+
+/* Shimmer 动画 */
+@import "tw-shimmer";
+
+/* m3-ripple 涟漪动效 */
+@import "m3-ripple/ripple.css";
+
+/* 扫描源文件，生成 TailwindCSS utility 类 */
+@source "../features";
+@source "../components";
+@source "../hooks";
