@@ -153,7 +153,7 @@ const init = () => {
   // 4. 创建 Portal 目标节点（ConfirmToolUI 弹窗渲染目标）
   const portalTarget = document.createElement("div");
   portalTarget.id = PORTAL_ID;
-  portalTarget.style.cssText = "position:absolute;z-index:50;inset:0;";
+  portalTarget.style.cssText = "position:absolute;z-index:50;";
   //shadowRoot.appendChild(portalTarget);
 
   // 5. 创建 React 挂载点

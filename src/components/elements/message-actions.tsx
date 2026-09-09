@@ -30,7 +30,7 @@ export function MessageActions({
   className,
   ...props
 }: MessageActionsProps) {
-  const buttonClassName = cn(ghostButton, "size-7");
+  const buttonClassName = cn(ghostButton, "size-7", className);
 
   return (
     <div data-slot="message-actions" className={cn("flex items-center gap-1", className)} {...props}>
@@ -49,10 +49,7 @@ export function MessageActions({
             aria-label="Mark response helpful"
             aria-pressed={reaction === "up"}
             onClick={() => onReactionChange?.(reaction === "up" ? null : "up")}
-            className={cn(
-              buttonClassName,
-              reaction === "up" && "bg-foreground/[0.06] text-foreground/90 dark:bg-foreground/[0.09]"
-            )}>
+            className={cn(buttonClassName, reaction === "up" && "bg-foreground/[0.06] text-foreground/90 dark:bg-foreground/[0.09]")}>
             <ThumbsUpIcon className="size-3.5" />
           </button>
           <button
@@ -60,10 +57,7 @@ export function MessageActions({
             aria-label="Mark response unhelpful"
             aria-pressed={reaction === "down"}
             onClick={() => onReactionChange?.(reaction === "down" ? null : "down")}
-            className={cn(
-              buttonClassName,
-              reaction === "down" && "bg-foreground/[0.06] text-foreground/90 dark:bg-foreground/[0.09]"
-            )}>
+            className={cn(buttonClassName, reaction === "down" && "bg-foreground/[0.06] text-foreground/90 dark:bg-foreground/[0.09]")}>
             <ThumbsDownIcon className="size-3.5" />
           </button>
         </>

@@ -24,7 +24,7 @@ const ChatWidget: FC = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="z-[2147483647] flex h-[500px] w-[380px] flex-col overflow-hidden rounded-xl border border-[#F5D2AF]/30 bg-[#3C5F32]/65 shadow-2xl shadow-black/30 backdrop-blur-xl"
+            className="chat-dialog-glass z-[2147483647] flex h-[500px] w-[380px] flex-col overflow-hidden rounded-xl border border-white/15 bg-[#3C5F32]/80 shadow-2xl shadow-black/30 backdrop-blur-2xl"
             style={{ transformOrigin: "bottom right" }}
             initial={{ opacity: 0, scale: 0.5, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}

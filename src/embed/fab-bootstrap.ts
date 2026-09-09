@@ -92,12 +92,15 @@ const init = () => {
   // 3. 创建 Portal 目标节点（ConfirmToolUI 弹窗渲染目标，暂不加入 DOM）
   const portalTarget = document.createElement("div");
   portalTarget.id = PORTAL_ID;
-  portalTarget.style.cssText = "position:absolute;z-index:50;pointer-events:none;inset:0;";
+  portalTarget.style.cssText = "position:absolute;z-index:50;";
 
   // 4. 创建 React 挂载点（隐藏，核心包加载后使用）
   const mountPoint = document.createElement("div");
   mountPoint.id = MOUNT_ID;
   mountPoint.style.cssText = "position:fixed;bottom:96px;right:10px;z-index:9999999;display:none;";
+
+  // 5. 创建模板容器（mountWidget 渲染到此容器，不影响 portalTarget 兄弟节点）
+  const template = document.createElement("div");
 
   // 5. 渲染 FAB 按钮
   const fabButton = document.createElement("button");
@@ -146,8 +149,9 @@ const init = () => {
     document.body.appendChild(scriptEl);
   });
 
-  // 7. 将 mountPoint 和 portalTarget 加入 DOM（但 mountPoint 隐藏）
+  // 7. 将 mountPoint、portalTarget、template 加入 DOM（但 mountPoint 隐藏）
   mountPoint.appendChild(portalTarget);
+  mountPoint.appendChild(template);
   shadowRoot.appendChild(mountPoint);
 };
 

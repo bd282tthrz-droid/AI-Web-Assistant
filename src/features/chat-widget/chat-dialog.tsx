@@ -27,7 +27,7 @@ const ChatMessages: FC = () => {
 // 输入区域组件 - 输入框 + 发送按钮
 const ChatComposer: FC = () => {
   return (
-    <ComposerPrimitive.Root className="flex items-end gap-2 border-t border-[#F5D2AF]/20 bg-[#3C5F32]/65 p-3 backdrop-blur-md">
+    <ComposerPrimitive.Root className="flex items-end gap-2 border-t border-white/10 bg-[#3C5F32]/40 p-3 backdrop-blur-lg">
       <ComposerPrimitive.Input
         placeholder="Type a message..."
         submitMode="enter"
@@ -46,7 +46,6 @@ const ChatComposer: FC = () => {
 // 否则 tool-call part 渲染时找不到 ConfirmToolUI，human tool 确认弹窗不会出现
 const ChatDialog: FC = () => {
   const { runtime, config } = useAssistant();
-  debugLog.log("runtime", runtime);
   return (
     <AssistantRuntimeProvider runtime={runtime} config={config}>
       <ThreadPrimitive.Root className="flex h-full flex-col">

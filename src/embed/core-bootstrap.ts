@@ -102,7 +102,13 @@ const init = () => {
   const shadowRoot = host.shadowRoot;
   const mountPoint = shadowRoot.getElementById(MOUNT_ID);
   const portalTarget = shadowRoot.getElementById(PORTAL_ID);
-  if (!mountPoint || !portalTarget) return;
+  // 模板容器是 mountPoint 的第一个 div 子元素（portalTarget 之后）
+  const template = mountPoint?.querySelector("div:not([id])") as HTMLElement | null;
+  if (!mountPoint || !portalTarget || !template) return;
+
+  // 移除 FAB 加载动画（由 fab-bootstrap 替换 FAB 按钮时创建）
+  const loader = shadowRoot.querySelector(".fab-loading");
+  if (loader) loader.remove();
 
   // 启用 react-stately Shadow DOM 兼容模式
   (globalThis as Record<string, unknown>).__web_assistant_shadow = (enableShadowDOM(), true);
@@ -113,8 +119,8 @@ const init = () => {
   // 确认 mountPoint 可见
   mountPoint.style.display = "";
 
-  // 挂载 React Widget
-  mountWidget(mountPoint, portalTarget);
+  // 挂载 React Widget（渲染到 template，保留 portalTarget 兄弟节点）
+  mountWidget(template, portalTarget);
 };
 
 // 等待 DOM 就绪后初始化

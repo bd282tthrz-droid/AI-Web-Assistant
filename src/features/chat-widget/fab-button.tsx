@@ -20,7 +20,7 @@ const FabButton: FC<FabButtonProps> = ({ isOpen, onToggle }) => {
       aria-label={isOpen ? "Close AI Assistant" : "Open AI Assistant"}
       className="fixed bottom-6 right-6 z-[2147483647] h-14 w-14 rounded-full bg-[#FF641E] text-white shadow-lg shadow-[#FF641E]/30 transition-transform hover:scale-105 hover:bg-[#FF641E]/90">
       {isOpen ? <ICONS.close size={24} /> : <ICONS.wandMagic size={24} />}
-      {/*   <Ripple /> */}
+      <Ripple />
     </Button>
   );
 };

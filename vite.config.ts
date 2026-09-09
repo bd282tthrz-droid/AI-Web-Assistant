@@ -4,6 +4,7 @@ import tailwindcssVite from "@tailwindcss/vite";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs";
+import remToPixel from "postcss-rem-to-pixel";
 import { CONFIG } from "./src/config/index.ts";
 
 // ESM 环境下获取 __dirname
@@ -46,6 +47,18 @@ export default defineConfig(({ mode }) => {
       define: {
         // 替换 process.env.NODE_ENV，部分依赖（如 React 开发模式检测）在浏览器中会引用它
         "process.env.NODE_ENV": JSON.stringify("production")
+      },
+      css: {
+        postcss: {
+          plugins: [
+            remToPixel({
+              rootValue: 16,
+              propList: ["*"],
+              mediaQuery: false,
+              minPixelValue: 0
+            })
+          ]
+        }
       },
       build: {
         lib: {
@@ -126,6 +139,18 @@ export default defineConfig(({ mode }) => {
       },
       define: {
         "process.env.NODE_ENV": JSON.stringify("production")
+      },
+      css: {
+        postcss: {
+          plugins: [
+            remToPixel({
+              rootValue: 16,
+              propList: ["*"],
+              mediaQuery: false,
+              minPixelValue: 0
+            })
+          ]
+        }
       },
       build: {
         lib: {

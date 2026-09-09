@@ -1,11 +1,10 @@
-import { MessagePrimitive, MessagePartPrimitive } from "@assistant-ui/react";
+import { MessagePrimitive, MessagePartPrimitive, ThreadPrimitive, SuggestionPrimitive } from "@assistant-ui/react";
 import { useActionBarCopy } from "@assistant-ui/core/react";
 import { useActionBarReload } from "@assistant-ui/core/react";
 import { useAuiState } from "@assistant-ui/store";
 import { useState, useCallback, type FC } from "react";
 import { MessageActions } from "@/components/elements/message-actions";
 import type { Reaction } from "@/components/elements/message-actions";
-import { ICONS } from "@/constants/icon";
 import { HermesThinking } from "@/components/hermes-thinking";
 import { StreamingText, type Segment } from "@/components/assistant-ui/elements/streaming-text";
 
@@ -53,11 +52,11 @@ const UserMessage: FC = () => {
   });
 
   return (
-    <MessagePrimitive.Root className="flex flex-col items-end my-6">
-      <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-[#FF641E] px-4 py-2.5 text-sm text-white shadow-sm">
+    <MessagePrimitive.Root className="flex flex-col items-end mt-6">
+      <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-[#FF641E]/85 px-4 py-2.5 text-sm text-white shadow-sm backdrop-blur-sm">
         <MessageContent />
       </div>
-      <MessageActions className="mt-2 justify-end" copied={isCopied} helpful={false} onCopy={copy} />
+      <MessageActions className="justify-end text-white" copied={isCopied} helpful={false} onCopy={copy} />
     </MessagePrimitive.Root>
   );
 };
@@ -84,9 +83,11 @@ const AssistantMessage: FC = () => {
 
   return (
     <MessagePrimitive.Root className="mt-6">
-      <div className="rounded-2xl rounded-bl-sm bg-[#F5D2AF] px-4 py-2.5 text-sm text-[#3C5F32] shadow-sm">
+      <div className="rounded-2xl rounded-bl-sm bg-[#F5D2AF]/80 px-4 py-2.5 text-sm text-[#3C5F32] shadow-sm backdrop-blur-sm">
         <MessageContent isUser={false} />
-        {/* 消息操作栏：流式输出时隐藏 */}
+        <div className="grid grid-cols-2 gap-2">
+          <ThreadPrimitive.Suggestions>{() => <SuggestionItem />}</ThreadPrimitive.Suggestions>
+        </div>
         {!isRunning && (
           <MessageActions
             className="mt-2 justify-end"
@@ -102,5 +103,18 @@ const AssistantMessage: FC = () => {
     </MessagePrimitive.Root>
   );
 };
-
+const SuggestionItem = () => {
+  return (
+    <SuggestionPrimitive.Trigger send asChild>
+      <button className="rounded-lg border p-3 hover:bg-muted">
+        <div className="font-medium">
+          <SuggestionPrimitive.Title />
+        </div>
+        <div className="text-muted-foreground text-sm">
+          <SuggestionPrimitive.Description />
+        </div>
+      </button>
+    </SuggestionPrimitive.Trigger>
+  );
+};
 export { UserMessage, AssistantMessage };

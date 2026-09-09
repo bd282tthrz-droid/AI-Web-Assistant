@@ -15,7 +15,7 @@ const ChatDialogPanel: FC<ChatDialogPanelProps> = ({ onClose }) => {
   debugLog.log("load");
   return (
     <>
-      <header className="flex items-center justify-between border-b border-[#F5D2AF]/20 bg-[#3C5F32]/65 px-4 py-3 backdrop-blur-md">
+      <header className="flex items-center justify-between border-b border-white/10 bg-[#3C5F32]/40 px-4 py-3 backdrop-blur-lg">
         <div className="flex items-center gap-2">
           <ICONS.robot size={20} className="text-[#F5D2AF]" />
           <h2 className="text-sm font-semibold text-[#F5D2AF]">AI Assistant</h2>

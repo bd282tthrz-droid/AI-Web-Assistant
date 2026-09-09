@@ -81,7 +81,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
       )}
 
       {/* 主内容区 - 包含 banner 和商品列表 */}
-      <main data-page-type="home" className="mx-auto max-w-6xl px-4 py-6">
+      <main data-page-type="home" className="mx-auto max-w-7xl px-4 py-6">
         {/* Banner */}
         <div className="mb-6 flex h-48 items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">
           <div className="text-center">
@@ -104,12 +104,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
         </div>
         <div className="container mx-auto px-4 py-6">
           <div className="text-sm text-gray-500 mb-6 flex items-center space-x-2">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                 strokeLinecap="round"
@@ -140,24 +135,16 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
             <a className="bg-teal text-white px-6 py-2 rounded-t font-semibold" href="#">
               Product List
             </a>
-            <a
-              className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-6 py-2 rounded-t font-semibold"
-              href="#background">
+            <a className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-6 py-2 rounded-t font-semibold" href="#background">
               Background
             </a>
-            <a
-              className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-6 py-2 rounded-t font-semibold"
-              href="#applications">
+            <a className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-6 py-2 rounded-t font-semibold" href="#applications">
               Applications
             </a>
-            <a
-              className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-6 py-2 rounded-t font-semibold"
-              href="#case-study">
+            <a className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-6 py-2 rounded-t font-semibold" href="#case-study">
               Case Study
             </a>
-            <a
-              className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-6 py-2 rounded-t font-semibold"
-              href="#advantages">
+            <a className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-6 py-2 rounded-t font-semibold" href="#advantages">
               Advantages
             </a>
             <a className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-6 py-2 rounded-t font-semibold" href="#faq">
@@ -186,17 +173,10 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
               <div className="flex-grow max-w-3xl">
                 <h3 className="text-teal font-semibold text-lg mb-2 hover:underline cursor-pointer flex items-center">
                   Recombinant Full Length Human RAP1A Protein, His-tagged
-                  <span className="bg-red-100 text-red-500 text-xs px-1 ml-2 rounded border border-red-200">
-                    Full L.
-                  </span>
+                  <span className="bg-red-100 text-red-500 text-xs px-1 ml-2 rounded border border-red-200">Full L.</span>
                 </h3>
                 <div className="text-orange font-medium mb-3 flex items-center">
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
                       strokeLinecap="round"
@@ -228,19 +208,12 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                 </div>
               </div>
               <div className="mt-4 md:mt-0 flex flex-col items-end w-full md:w-auto">
-                <div className="border border-gray-200 px-4 py-2 mb-3 text-center min-w-[120px] text-gray-800">
-                  $319 / 25μg
-                </div>
+                <div className="border border-gray-200 px-4 py-2 mb-3 text-center min-w-[120px] text-gray-800">$319 / 25μg</div>
                 <div className="flex space-x-2">
                   <button
                     className="btn-orange px-3 py-1.5 rounded text-sm flex items-center"
                     data-name="Recombinant Full Length Human RAP1A Protein, His-tagged">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                         strokeLinecap="round"
@@ -250,12 +223,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                     Add to Cart
                   </button>
                   <button className="btn-blue px-3 py-1.5 rounded text-sm flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                         strokeLinecap="round"
@@ -281,12 +249,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                   <span className="bg-red-500 text-white text-xs px-1 ml-2 rounded uppercase font-bold">Hot</span>
                 </h3>
                 <div className="text-orange font-medium mb-3 flex items-center">
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
                       strokeLinecap="round"
@@ -316,19 +279,10 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                 </div>
               </div>
               <div className="mt-4 md:mt-0 flex flex-col items-end w-full md:w-auto">
-                <div className="border border-gray-200 px-4 py-2 mb-3 text-center min-w-[120px] text-gray-800">
-                  $298 / 1mg
-                </div>
+                <div className="border border-gray-200 px-4 py-2 mb-3 text-center min-w-[120px] text-gray-800">$298 / 1mg</div>
                 <div className="flex space-x-2">
-                  <button
-                    className="btn-orange px-3 py-1.5 rounded text-sm flex items-center"
-                    data-name="Recombinant Human EGF Protein">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg">
+                  <button className="btn-orange px-3 py-1.5 rounded text-sm flex items-center" data-name="Recombinant Human EGF Protein">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                         strokeLinecap="round"
@@ -338,12 +292,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                     Add to Cart
                   </button>
                   <button className="btn-blue px-3 py-1.5 rounded text-sm flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                         strokeLinecap="round"
@@ -369,12 +318,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                   <span className="bg-red-500 text-white text-xs px-1 ml-2 rounded uppercase font-bold">Hot</span>
                 </h3>
                 <div className="text-orange font-medium mb-3 flex items-center">
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
                       strokeLinecap="round"
@@ -404,19 +348,12 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                 </div>
               </div>
               <div className="mt-4 md:mt-0 flex flex-col items-end w-full md:w-auto">
-                <div className="border border-gray-200 px-4 py-2 mb-3 text-center min-w-[120px] text-gray-800">
-                  $298 / 1mg
-                </div>
+                <div className="border border-gray-200 px-4 py-2 mb-3 text-center min-w-[120px] text-gray-800">$298 / 1mg</div>
                 <div className="flex space-x-2">
                   <button
                     className="btn-orange px-3 py-1.5 rounded text-sm flex items-center"
                     data-name="Recombinant Full Length Human S100 calcium binding protein A4 Protein, His tagged">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                         strokeLinecap="round"
@@ -426,12 +363,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                     Add to Cart
                   </button>
                   <button className="btn-blue px-3 py-1.5 rounded text-sm flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                         strokeLinecap="round"
@@ -457,12 +389,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                   <span className="bg-red-500 text-white text-xs px-1 ml-2 rounded uppercase font-bold">Hot</span>
                 </h3>
                 <div className="text-orange font-medium mb-3 flex items-center">
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
                       strokeLinecap="round"
@@ -492,19 +419,12 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                 </div>
               </div>
               <div className="mt-4 md:mt-0 flex flex-col items-end w-full md:w-auto">
-                <div className="border border-gray-200 px-4 py-2 mb-3 text-center min-w-[120px] text-gray-800">
-                  $298 / 1mg
-                </div>
+                <div className="border border-gray-200 px-4 py-2 mb-3 text-center min-w-[120px] text-gray-800">$298 / 1mg</div>
                 <div className="flex space-x-2">
                   <button
                     className="btn-orange px-3 py-1.5 rounded text-sm flex items-center"
                     data-name="Recombinant Full Length Human hexokinase 2 Protein, His tagged">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                         strokeLinecap="round"
@@ -514,12 +434,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                     Add to Cart
                   </button>
                   <button className="btn-blue px-3 py-1.5 rounded text-sm flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                         strokeLinecap="round"
@@ -582,15 +497,13 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
             <h2 className="text-2xl font-semibold text-teal border-b-2 border-teal pb-2 mb-4">Background</h2>
             <h3 className="text-lg font-semibold text-teal mb-3 pl-3 border-l-4 border-teal">Overview</h3>
             <p className="text-gray-700 leading-relaxed mb-6">
-              A full-length protein is a complete protein sequence from the N terminal to the C terminal. The complete
-              amino acid sequence of the protein can be obtained by full length protein sequencing, which is essential
-              for understanding the biological function of the protein. It helps scientists fully understand the
-              function of proteins, including how they interact with other molecules, as well as their localization and
-              mechanism of action within cells. The study of full length proteins can reveal the role of specific
-              proteins in the development of diseases, which is of great significance for the discovery of new
-              therapeutic targets and methods. In addition, structural analysis of full length proteins can provide
-              detailed information about the three-dimensional structure of proteins, which is of guiding significance
-              for understanding their functions and designing experiments.
+              A full-length protein is a complete protein sequence from the N terminal to the C terminal. The complete amino acid sequence of the protein can be
+              obtained by full length protein sequencing, which is essential for understanding the biological function of the protein. It helps scientists fully
+              understand the function of proteins, including how they interact with other molecules, as well as their localization and mechanism of action
+              within cells. The study of full length proteins can reveal the role of specific proteins in the development of diseases, which is of great
+              significance for the discovery of new therapeutic targets and methods. In addition, structural analysis of full length proteins can provide
+              detailed information about the three-dimensional structure of proteins, which is of guiding significance for understanding their functions and
+              designing experiments.
             </p>
             <div className="flex justify-center mb-8">
               <img
@@ -601,32 +514,28 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
             </div>
             <h3 className="text-lg font-semibold text-teal mb-3 pl-3 border-l-4 border-teal">Challenges</h3>
             <p className="text-gray-700 leading-relaxed mb-4">
-              In biological research, the study of full-length proteins is of great significance because their structure
-              often determines their function. However, there are many problems in the process of expression. For
-              example:
+              In biological research, the study of full-length proteins is of great significance because their structure often determines their function.
+              However, there are many problems in the process of expression. For example:
             </p>
             <ul className="list-disc pl-5 text-gray-700 leading-relaxed space-y-2 mb-6">
               <li>
                 <strong>Expression challenges:</strong>
-                The expression of full-length proteins in prokaryotic cells such as E. coli may be affected by a variety
-                of factors, including protein hydrophilicity, codon rarity, and protein toxicity. For example, proteins
-                that are too hydrophobic are difficult to express, and proteins that contain multiple rare codons linked
-                together may also cause difficulty in expression. In order to solve these problems, researchers need to
-                analyze the protein sequence and secondary structure, and adopt corresponding strategies to optimize the
-                expression conditions.
+                The expression of full-length proteins in prokaryotic cells such as E. coli may be affected by a variety of factors, including protein
+                hydrophilicity, codon rarity, and protein toxicity. For example, proteins that are too hydrophobic are difficult to express, and proteins that
+                contain multiple rare codons linked together may also cause difficulty in expression. In order to solve these problems, researchers need to
+                analyze the protein sequence and secondary structure, and adopt corresponding strategies to optimize the expression conditions.
               </li>
               <li>
                 <strong>Translation initiation problems:</strong>
-                When expressing full-length proteins, problems with truncated products may be encountered. This may be
-                due to proteolysis or improper initiation of translation. To ensure the acquisition of full-length
-                proteins, expression vectors with fusion labels on both ends can be used to distinguish full-length
-                proteins from truncated proteins by increasing the imidazole concentration at elution.
+                When expressing full-length proteins, problems with truncated products may be encountered. This may be due to proteolysis or improper initiation
+                of translation. To ensure the acquisition of full-length proteins, expression vectors with fusion labels on both ends can be used to distinguish
+                full-length proteins from truncated proteins by increasing the imidazole concentration at elution.
               </li>
               <li>
                 <strong>Transmembrane protein challenges:</strong>
-                For specific full-length proteins such as transmembrane proteins, their expression and purification are
-                particularly challenging. To facilitate drug development, the MNP platform extracts high-purity
-                nanoscale cell membrane particles while maintaining the conformation and activity of membrane proteins.
+                For specific full-length proteins such as transmembrane proteins, their expression and purification are particularly challenging. To facilitate
+                drug development, the MNP platform extracts high-purity nanoscale cell membrane particles while maintaining the conformation and activity of
+                membrane proteins.
               </li>
             </ul>
             <div className="flex justify-center mb-8">
@@ -638,37 +547,33 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
             </div>
             <h3 className="text-lg font-semibold text-teal mb-3 pl-3 border-l-4 border-teal">Outlook</h3>
             <p className="text-gray-700 leading-relaxed mb-4">
-              The future of full-length protein research is full of promise and challenges, and with the continuous
-              advancement of technology, there are already many biologically important recombinant protein classes on
-              the market today. In the future, full-length proteins are expected to make breakthroughs in many other
-              areas. Including but not limited to:
+              The future of full-length protein research is full of promise and challenges, and with the continuous advancement of technology, there are already
+              many biologically important recombinant protein classes on the market today. In the future, full-length proteins are expected to make
+              breakthroughs in many other areas. Including but not limited to:
             </p>
             <ul className="list-disc pl-5 text-gray-700 leading-relaxed space-y-2 mb-6">
               <li>
                 <strong>Improved accuracy of protein structure prediction:</strong>
-                With the development of AI-based protein structure prediction technologies such as AlphaFold2, the
-                ability of these technologies to predict the three-dimensional structure of unknown proteins will become
-                even more powerful in the future. This enhancement will not only lead to a better understanding of
-                protein function, but also accelerate the process of drug discovery and biological research.
+                With the development of AI-based protein structure prediction technologies such as AlphaFold2, the ability of these technologies to predict the
+                three-dimensional structure of unknown proteins will become even more powerful in the future. This enhancement will not only lead to a better
+                understanding of protein function, but also accelerate the process of drug discovery and biological research.
               </li>
               <li>
                 <strong>Research on multi-domain proteins and complexes:</strong>
-                At present, there are still challenges in predicting the structure of multi-domain proteins and protein
-                complexes. Future research may lead to breakthroughs in these areas, leading to a more complete
-                understanding of protein complexity and diversity.
+                At present, there are still challenges in predicting the structure of multi-domain proteins and protein complexes. Future research may lead to
+                breakthroughs in these areas, leading to a more complete understanding of protein complexity and diversity.
               </li>
               <li>
                 <strong>Innovative applications of protein design:</strong>
-                The application of deep learning techniques has made it possible to design completely new proteins from
-                scratch. In the future, this technology may be further developed to create customized proteins with
-                specific functions, such as enzymes, vaccines, and drug delivery vectors, which will have a profound
-                impact on the pharmaceutical and biotechnology industries.
+                The application of deep learning techniques has made it possible to design completely new proteins from scratch. In the future, this technology
+                may be further developed to create customized proteins with specific functions, such as enzymes, vaccines, and drug delivery vectors, which will
+                have a profound impact on the pharmaceutical and biotechnology industries.
               </li>
               <li>
                 <strong>Improvement of computational tools and databases:</strong>
-                With the accumulation of more and more information about protein sequences and their structures,
-                combined with advances in artificial intelligence technology, more efficient computational tools and
-                databases are likely to emerge in the future to support full-length protein research and innovation.
+                With the accumulation of more and more information about protein sequences and their structures, combined with advances in artificial
+                intelligence technology, more efficient computational tools and databases are likely to emerge in the future to support full-length protein
+                research and innovation.
               </li>
             </ul>
             <div className="flex justify-center mb-8">
@@ -684,19 +589,18 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
             <ul className="list-disc pl-5 text-gray-700 leading-relaxed space-y-2">
               <li>
                 <strong>Drug development:</strong>
-                By preparing recombinant full-length proteins, it is possible to conduct drug-target protein interaction
-                studies, understand the binding mechanism of the drug to the target, and evaluate the activity and
-                specificity of the drug.
+                By preparing recombinant full-length proteins, it is possible to conduct drug-target protein interaction studies, understand the binding
+                mechanism of the drug to the target, and evaluate the activity and specificity of the drug.
               </li>
               <li>
                 <strong>Cell therapy:</strong>
-                In the field of cell therapy, recombinant full-length proteins can be used to prepare therapeutic cell
-                products, such as receptor proteins in CAR-T cell therapy for tumor immunotherapy.
+                In the field of cell therapy, recombinant full-length proteins can be used to prepare therapeutic cell products, such as receptor proteins in
+                CAR-T cell therapy for tumor immunotherapy.
               </li>
               <li>
                 <strong>Vaccine development:</strong>
-                By expressing recombinant full-length proteins, antigens for use in vaccines can be prepared to induce
-                an immune response to protect humans from pathogens.
+                By expressing recombinant full-length proteins, antigens for use in vaccines can be prepared to induce an immune response to protect humans from
+                pathogens.
               </li>
             </ul>
           </section>
@@ -705,19 +609,16 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
             <div className="mb-8">
               <h3 className="font-bold text-gray-800 mb-2">Case Study 1: Recombinant Human EGF Protein</h3>
               <p className="text-gray-700 leading-relaxed text-sm mb-4">
-                Re-education of the tumor microenvironment with immune checkpoint inhibitors (ICI) has provided the most
-                significant advancement in cancer management, with impressive efficacy and durable response reported.
-                However, low response rates and a high frequency of immune-related adverse events (irAEs) remain
-                associated with ICI therapies. The latter can be linked to their high affinity and avidity for their
-                target that fosters on-target/off-tumor binding and subsequent breaking of immune self-tolerance in
-                normal tissues. Many multispecific protein formats have been proposed to increase the tumor cell's
-                selectivity of ICI therapies.
+                Re-education of the tumor microenvironment with immune checkpoint inhibitors (ICI) has provided the most significant advancement in cancer
+                management, with impressive efficacy and durable response reported. However, low response rates and a high frequency of immune-related adverse
+                events (irAEs) remain associated with ICI therapies. The latter can be linked to their high affinity and avidity for their target that fosters
+                on-target/off-tumor binding and subsequent breaking of immune self-tolerance in normal tissues. Many multispecific protein formats have been
+                proposed to increase the tumor cell's selectivity of ICI therapies.
                 <br />
-                In this study, the researchers explored the engineering of a bispecific Nanofitin by the fusion of an
-                anti-epidermal growth factor receptor (EGFR) and anti-programmed cell death ligand 1 (PDL1) Nanofitin
-                modules. While lowering the affinity of the Nanofitin modules for their respective target, the fusion
-                enables the simultaneous engagement of EGFR and PDL1, which translates into a selective binding to tumor
-                cells co-expressing EGFR and PDL1 only.
+                In this study, the researchers explored the engineering of a bispecific Nanofitin by the fusion of an anti-epidermal growth factor receptor
+                (EGFR) and anti-programmed cell death ligand 1 (PDL1) Nanofitin modules. While lowering the affinity of the Nanofitin modules for their
+                respective target, the fusion enables the simultaneous engagement of EGFR and PDL1, which translates into a selective binding to tumor cells
+                co-expressing EGFR and PDL1 only.
               </p>
               <div className="flex flex-col items-center">
                 <img
@@ -728,8 +629,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
                 <p className="text-xs text-gray-500 italic text-center">
                   (Perrine Jacquot, 2023)
                   <br />
-                  Fig1. EGFR phosphorylation level in the presence or the absence of EGF, Cetuximab and B10 Nanofitin
-                  studied by Western Blot on A431 cell line.
+                  Fig1. EGFR phosphorylation level in the presence or the absence of EGF, Cetuximab and B10 Nanofitin studied by Western Blot on A431 cell line.
                 </p>
               </div>
             </div>

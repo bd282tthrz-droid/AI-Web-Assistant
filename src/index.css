@@ -12,3 +12,37 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* Virtuoso 自定义滚动条 */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #83a37c transparent;
+}
+
+/* Virtuoso 消息列表布局 */
+.custom-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 12px;
+  padding-bottom: 20px !important;
+}
+
+/* 液态玻璃容器 — 边缘光晕 */
+.chat-dialog-glass {
+  position: relative;
+}
+
+.chat-dialog-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse at 20% 0%,
+    rgba(255, 255, 255, 0.12) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
