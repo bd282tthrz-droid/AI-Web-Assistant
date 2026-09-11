@@ -85,36 +85,34 @@ const AssistantMessage: FC = () => {
     <MessagePrimitive.Root className="mt-6">
       <div className="rounded-2xl rounded-bl-sm bg-[#F5D2AF]/80 px-4 py-2.5 text-sm text-[#3C5F32] shadow-sm backdrop-blur-sm">
         <MessageContent isUser={false} />
-        <div className="grid grid-cols-2 gap-2">
-          <ThreadPrimitive.Suggestions>{() => <SuggestionItem />}</ThreadPrimitive.Suggestions>
-        </div>
         {!isRunning && (
-          <MessageActions
-            className="mt-2 justify-end"
-            copied={isCopied}
-            reaction={reaction}
-            regenerating={false}
-            onCopy={copy}
-            onReactionChange={setReaction}
-            onRegenerate={handleRegenerate}
-          />
+          <>
+            <div className="flex flex-col">
+              <ThreadPrimitive.Suggestions>
+                {() => (
+                  <SuggestionPrimitive.Trigger
+                    send
+                    className="mt-2 rounded-lg border border-[#3C5F32]/20 bg-[#F5D2AF]/40 px-3 py-2 text-sm text-[#3C5F32]/70 hover:bg-[#E2DED9]/50 cursor-pointer transition-colors">
+                    <SuggestionPrimitive.Title />
+                  </SuggestionPrimitive.Trigger>
+                )}
+              </ThreadPrimitive.Suggestions>
+            </div>
+
+            <MessageActions
+              className="mt-2 justify-end"
+              copied={isCopied}
+              reaction={reaction}
+              regenerating={false}
+              onCopy={copy}
+              onReactionChange={setReaction}
+              onRegenerate={handleRegenerate}
+            />
+          </>
         )}
       </div>
     </MessagePrimitive.Root>
   );
 };
-const SuggestionItem = () => {
-  return (
-    <SuggestionPrimitive.Trigger send asChild>
-      <button className="rounded-lg border p-3 hover:bg-muted">
-        <div className="font-medium">
-          <SuggestionPrimitive.Title />
-        </div>
-        <div className="text-muted-foreground text-sm">
-          <SuggestionPrimitive.Description />
-        </div>
-      </button>
-    </SuggestionPrimitive.Trigger>
-  );
-};
+
 export { UserMessage, AssistantMessage };

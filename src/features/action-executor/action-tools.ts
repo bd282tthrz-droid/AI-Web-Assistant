@@ -6,7 +6,7 @@
 interface ToolDefinition {
   readonly name: string;
   readonly description: string;
-  readonly parameters: Record<string, string>;
+  readonly arguments: Record<string, string>;
 }
 
 // All available tool definitions
@@ -14,7 +14,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   {
     name: "click_element",
     description: "Click on a page element, such as add-to-cart button, navigation link, etc. (requires user confirmation)",
-    parameters: {
+    arguments: {
       data_attributes: "data-* attribute selector (e.g. [data-assistant-action='add-to-cart'])",
       css_selector: "PRIMARY selector - direct CSS selector from the interactive elements table's '最佳选择器' column (e.g. .btn-orange.px-3). Fill this first.",
       text_match: "Exact visible text of the element (e.g. 'Add to Cart'). Fill from '元素文本' column.",
@@ -25,7 +25,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   {
     name: "fill_input",
     description: "Fill content into an input field, such as search box, form field, etc. Auto-presses Enter after filling to trigger search/submit. (auto-execute)",
-    parameters: {
+    arguments: {
       data_attributes: "data-* attribute selector (e.g. [data-assistant-action='search-input'])",
       css_selector: "PRIMARY selector - direct CSS selector from the interactive elements table's '最佳选择器' column",
       text_match: "Input placeholder or label text. Fill from '元素文本' column.",
@@ -36,7 +36,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   {
     name: "scroll_to",
     description: "Scroll the page to a specified element or position (auto-execute)",
-    parameters: {
+    arguments: {
       data_attributes: "data-* attribute selector for target element",
       css_selector: "PRIMARY selector - direct CSS selector from the interactive elements table's '最佳选择器' column",
       text_match: "Text content of the element to scroll to. Fill from '元素文本' column.",
@@ -47,14 +47,14 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   {
     name: "navigate_to",
     description: "Navigate to a specified URL (requires user confirmation)",
-    parameters: {
+    arguments: {
       url: "Target URL (required)"
     }
   },
   {
     name: "highlight_element",
     description: "Highlight a page element to draw user attention (auto-execute)",
-    parameters: {
+    arguments: {
       data_attributes: "data-* attribute selector",
       css_selector: "PRIMARY selector - direct CSS selector from the interactive elements table's '最佳选择器' column",
       text_match: "Visible text of the element. Fill from '元素文本' column.",
@@ -85,7 +85,7 @@ ${TOOL_DEFINITIONS.map(
   (tool) => `
 #### ${tool.name}
 ${tool.description}
-Parameters: ${JSON.stringify(tool.parameters)}`
+Parameters: ${JSON.stringify(tool.arguments)}`
 ).join("\n")}
 
 ### Usage Rules

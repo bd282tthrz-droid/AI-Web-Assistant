@@ -1,5 +1,5 @@
 // 确认工具面板逻辑
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import type { ToolCallMessagePartProps } from "@assistant-ui/react";
 import type { ActionResult, ActionCall } from "@/features/action-executor/action-types";
 import { executeAction } from "@/features/action-executor/action-executor";
@@ -31,27 +31,39 @@ const TOOL_LABEL_MAP: Record<string, string> = {
 export function useConfirmTool(
   toolName: string,
   args: ConfirmToolArgs,
-  addResult: ToolCallMessagePartProps<ConfirmToolArgs, ActionResult>["addResult"]
+  addResult: ToolCallMessagePartProps<ConfirmToolArgs, ActionResult>["addResult"],
+  result?: ActionResult
 ) {
   const portalTarget = usePortalTarget();
-  const [isOpen, setIsOpen] = useState(toolName !== undefined);
+  // 如果已有结果（虚拟列表回收后重新挂载），不显示确认面板
+  const [isOpen, setIsOpen] = useState(() => result === undefined);
   const [resolved, setResolved] = useState(false);
   const [executing, setExecuting] = useState(false);
 
+  // 已有结果时返回结果信息
+  const hasResult = result !== undefined;
+  const resultSuccess = result?.success ?? false;
+  const resultMessage = useMemo(() => {
+    if (!result) return "";
+    return result.success
+      ? result.message ?? "Operation completed"
+      : result.message ?? result.error ?? "Operation failed";
+  }, [result]);
+
   // 销毁面板并回传结果的统一出口
   const resolveWith = useCallback(
-    (result: ActionResult | ToolResponse<ActionResult>) => {
+    (res: ActionResult | ToolResponse<ActionResult>) => {
       if (resolved) return;
       setResolved(true);
       setIsOpen(false);
-      addResult(result);
+      addResult(res);
     },
     [resolved, addResult]
   );
 
   // portalTarget 为 null 时自动回传错误，避免工具调用永远挂起
   useEffect(() => {
-    if (!portalTarget && !resolved) {
+    if (!portalTarget && !resolved && !hasResult) {
       resolveWith(
         new ToolResponse({
           result: { success: false, error: "portal_missing", message: "Confirm UI portal target not found" },
@@ -59,13 +71,11 @@ export function useConfirmTool(
         })
       );
     }
-  }, [portalTarget, resolved, resolveWith]);
+  }, [portalTarget, resolved, resolveWith, hasResult]);
 
   // 构建 action description 文本
-  const description = (() => {
-    const context = typeof args.anchor_context === "string" && args.anchor_context !== ""
-      ? JSON.parse(args.anchor_context).anchorText
-      : args.anchor_context;
+  const description = useMemo(() => {
+    const context = typeof args.anchor_context === "string" && args.anchor_context !== "" ? JSON.parse(args.anchor_context).anchorText : args.anchor_context;
     if (args.url) return `Navigate to: ${args.url}`;
     if (args.data_attributes) return `Execute: ${args.data_attributes}`;
     if (context && typeof context === "object") {
@@ -74,7 +84,7 @@ export function useConfirmTool(
     if (args.text_match) return `Click: ${args.text_match}`;
     if (args.css_selector) return `Operate: ${args.css_selector}`;
     return "Perform page action";
-  })();
+  }, [args]);
 
   // 用户确认：先执行真实 DOM 操作，再回传执行结果
   const handleConfirm = useCallback(async () => {
@@ -82,12 +92,12 @@ export function useConfirmTool(
     setExecuting(true);
     try {
       const call = { tool: toolName, params: args } as ActionCall;
-      const result = await executeAction(call);
+      const res = await executeAction(call);
       resolveWith(
         new ToolResponse({
-          result,
-          isError: !result.success,
-          ...(result.data && { artifact: result.data as ReadonlyJSONValue })
+          result: res,
+          isError: !res.success,
+          ...(res.data && { artifact: res.data as ReadonlyJSONValue })
         })
       );
     } catch (err) {
@@ -115,6 +125,9 @@ export function useConfirmTool(
 
   return {
     isOpen,
+    hasResult,
+    resultSuccess,
+    resultMessage,
     description,
     executing,
     portalTarget,

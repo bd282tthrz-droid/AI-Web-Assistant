@@ -4,6 +4,7 @@ import { AuiConfig, Tools } from "@assistant-ui/react";
 import { toolkit } from "@/features/action-executor/toolkit";
 import { DifyChatTransport } from "@/services/dify/dify-chat-transport";
 import { clearCurrentSession, peekLastActionResult } from "@/services/dify/dify-conversation";
+import { suggestionAdapter } from "@/services/suggestion/suggestion-adapter";
 
 // Dify AI SDK 助手 Hook
 // 使用 @assistant-ui/react-ai-sdk 的 useChatRuntime
@@ -15,6 +16,9 @@ export const useDifySDKAssistant = () => {
 
   const runtime = useChatRuntime({
     transport,
+    adapters: {
+      suggestion: suggestionAdapter,
+    },
     // 工具执行完成后（addToolOutput），自动触发新请求发送 action_result 给 Dify
     // 根因：@ai-sdk/react 的 useChat 默认不自动发送，需显式配置
     sendAutomaticallyWhen: () => {

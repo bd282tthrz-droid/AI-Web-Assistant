@@ -21,7 +21,7 @@ const EMPTY_PRODUCT: ProductInfo = {
 
 // 优先使用 Schema.org 结构化数据（JSON-LD）
 const detectFromJsonLd = (): ProductInfo | null => {
-  const scripts = document.querySelectorAll('script[type="application/ld+json]')
+  const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
 
   for (const script of scripts) {
     try {

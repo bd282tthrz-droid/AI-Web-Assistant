@@ -1,23 +1,51 @@
 import { AssistantRuntimeProvider, ThreadPrimitive, ComposerPrimitive, AuiIf } from "@assistant-ui/react";
 import { useAssistant } from "@/hooks/use-assistant";
 import { ICONS } from "@/constants/icon";
-import VirtualMessageList from "./virtual-message-list";
+import { UserMessage, AssistantMessage } from "./chat-message-item";
 import type { FC } from "react";
-import { createDebugLogger } from "@/utils/debug-log";
 
 // 对话区域组件 - 消息列表渲染
-// 使用 AuiIf 替换废弃的 ThreadPrimitive.Empty（官方推荐迁移路径）
-// 使用 VirtualMessageList 实现官方虚拟列表（Unstable_MessageById 路径）
-const debugLog = createDebugLogger("[chat-dialog]");
+// 使用 ThreadPrimitive.Viewport + Messages 官方方案
+// Viewport 自带 autoScroll 自动跟随流式输出
+// AuiIf 处理空状态
 const ChatMessages: FC = () => {
   return (
-    <div className="relative flex-1 px-4 overflow-hidden">
-      <VirtualMessageList />
+    <div className="relative flex-1 overflow-hidden">
+      <ThreadPrimitive.Viewport
+        className="h-full px-4 overflow-y-auto custom-scrollbar"
+        autoScroll
+      >
+        <ThreadPrimitive.Messages>
+          {({ message }) =>
+            message.role === "user" ? <UserMessage /> : <AssistantMessage />
+          }
+        </ThreadPrimitive.Messages>
+      </ThreadPrimitive.Viewport>
 
       <AuiIf condition={(s) => s.thread.isEmpty}>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 text-[#F5D2AF]/60">
           <ICONS.message size={32} />
-          <p className="text-sm">Start a conversation with AI Assistant</p>
+          <p className="text-lg my-4">How can I help you?</p>
+          <div className="pointer-events-auto mt-2 flex flex-wrap justify-center gap-2">
+            <ThreadPrimitive.Suggestion
+              prompt="Show me popular products"
+              send
+              className="rounded-lg border border-[#F5D2AF]/40 bg-[#F5D2AF]/20 px-4 py-1 text-sm text-[#F5D2AF]/80 backdrop-blur-sm hover:bg-[#F5D2AF]/30 cursor-pointer transition-colors">
+              🔥 Popular Products
+            </ThreadPrimitive.Suggestion>
+            <ThreadPrimitive.Suggestion
+              prompt="What's your return policy?"
+              send
+              className="rounded-lg border border-[#F5D2AF]/40 bg-[#F5D2AF]/20 px-4 py-1 text-sm text-[#F5D2AF]/80 backdrop-blur-sm hover:bg-[#F5D2AF]/30 cursor-pointer transition-colors">
+              📦 Return Policy
+            </ThreadPrimitive.Suggestion>
+            <ThreadPrimitive.Suggestion
+              prompt="Any ongoing promotions?"
+              send
+              className="rounded-lg border border-[#F5D2AF]/40 bg-[#F5D2AF]/20 px-4 py-1 text-sm text-[#F5D2AF]/80 backdrop-blur-sm hover:bg-[#F5D2AF]/30 cursor-pointer transition-colors">
+              🏷️ Promotions
+            </ThreadPrimitive.Suggestion>
+          </div>
         </div>
       </AuiIf>
     </div>

@@ -25,7 +25,7 @@ if (import.meta.env.DEV) {
   // 创建 Portal 目标节点，与 UMD 生产模式对齐
   const portalTarget = document.createElement("div");
   portalTarget.id = "confirm-portal";
-  portalTarget.style.cssText = "position:absolute;z-index:50;";
+  portalTarget.style.cssText = "z-index:50;inset:0;";
   mountPoint.appendChild(portalTarget);
 
   // 启用 react-stately Shadow DOM 兼容模式

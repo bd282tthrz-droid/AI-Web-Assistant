@@ -4,6 +4,17 @@ import { type ComponentProps, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { take } from "@/lib/range";
 
+// 检测单词是否为 URL，返回干净的 href 和显示文本
+function parseUrlWord(word: string): { href: string; display: string } | null {
+  const match = word.match(/^(https?:\/\/[^\s]+)/);
+  if (!match) return null;
+
+  const url = match[1];
+  // 清理尾部的标点符号（仅用于 href，显示文本保留原样）
+  const cleanUrl = url.replace(/[.,!?;:)\]}>]+$/, "");
+  return { href: cleanUrl, display: word };
+}
+
 export interface Segment {
   text: string;
   mono?: boolean;
@@ -45,7 +56,23 @@ export function StreamingText({
       {...props}
     >
       {shown.map(({ word, mono: isMono }, i) => {
+        const urlInfo = parseUrlWord(word);
         const fresh = streaming && shown.length - 1 - i < 2;
+
+        if (urlInfo) {
+          return (
+            <a
+              key={i}
+              href={urlInfo.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#FF641E] underline decoration-[#FF641E]/40 hover:decoration-[#FF641E] transition-colors"
+            >
+              {urlInfo.display}{" "}
+            </a>
+          );
+        }
+
         return (
           <span
             key={i}

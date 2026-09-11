@@ -261,7 +261,7 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
       // 根因：Dify chatflow 同时触发 "message_end" 和 "workflow_finished" 事件
       // dify-ai-provider 在两个事件处理中都会调用 parseToolCalls 生成工具调用 chunks
       // 导致同一工具调用被输出两次（toolInputId 不同但 toolName + input 相同）
-      const seenToolNames = new Set<string>();
+      const seenToolCallIds = new Set<string>();
       const duplicateToolCallIds = new Set<string>();
       const seenToolCallKeys = new Set<string>();
       let hasFinished = false;
@@ -277,14 +277,18 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
               return;
             }
 
-            // 工具调用去重：按 toolName 拦截重复的 tool-input-start
+            // 工具调用去重：按 toolCallId (chunk.id) 拦截重复的 tool-input-start
+            // 根因：Dify chatflow 同时触发 message_end 和 workflow_finished 事件
+            // dify-ai-provider 在两个事件处理中都会调用 parseToolCalls 生成工具调用 chunks
+            // 改前按 toolName 去重 → 同一轮多个同工具调用会被误判丢弃
+            // 改后按 toolCallId 去重 → 允许多个不同工具共存，只过滤真正重复的
             if (chunk.type === "tool-input-start") {
-              if (seenToolNames.has(chunk.toolName)) {
+              if (seenToolCallIds.has(chunk.id)) {
                 duplicateToolCallIds.add(chunk.id);
-                debugLog.log("[dedup] duplicate tool-input-start skipped:", chunk.toolName);
+                debugLog.log("[dedup] duplicate tool-input-start skipped:", chunk.toolName, "id:", chunk.id.slice(0, 8));
                 return;
               }
-              seenToolNames.add(chunk.toolName);
+              seenToolCallIds.add(chunk.id);
               controller.enqueue(chunk);
               return;
             }
