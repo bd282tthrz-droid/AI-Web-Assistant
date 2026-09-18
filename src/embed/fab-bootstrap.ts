@@ -71,8 +71,8 @@ const FAB_STYLES = `
   }
 `;
 
-// SVG 图标（魔法棒）
-const WAND_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 6.5-11 11"/><path d="m14.5 6.5 3-3"/><path d="m17.5 3.5 3 3"/><path d="M9.5 14.5 3 21"/><path d="M17.5 14.5 21 11"/><path d="M14.5 17.5 11 21"/></svg>`;
+// SVG 图标（消息气泡 + Sparkle）
+const ASSISTANT_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/><path d="M18 3 L18.5 6.5 L22 7 L18.5 7.5 L18 11 L17.5 7.5 L14 7 L17.5 6.5 Z"/></svg>`;
 
 const init = () => {
   if (document.getElementById(CONTAINER_ID)) return;
@@ -105,13 +105,12 @@ const init = () => {
   // 5. 渲染 FAB 按钮
   const fabButton = document.createElement("button");
   fabButton.className = "fab-button";
-  fabButton.innerHTML = WAND_ICON;
+  fabButton.innerHTML = ASSISTANT_ICON;
   fabButton.setAttribute("aria-label", "Open AI Assistant");
   shadowRoot.appendChild(fabButton);
 
   // 6. 绑定点击事件 → 动态加载核心包
-  fabButton.addEventListener("click", () => {
-    // 防止重复加载
+  const loadCore = () => {
     if ((globalThis as Record<string, unknown>)[CORE_LOADED_FLAG]) return;
     (globalThis as Record<string, unknown>)[CORE_LOADED_FLAG] = true;
 
@@ -147,6 +146,72 @@ const init = () => {
       document.dispatchEvent(event);
     };
     document.body.appendChild(scriptEl);
+  };
+
+  fabButton.addEventListener("click", loadCore);
+
+  // ── 鼠标跟随浮标 ──
+  const hintEl = document.createElement("div");
+  hintEl.textContent = "❓ Ask AI";
+  hintEl.style.cssText =
+    "position:fixed;z-index:2147483646;pointer-events:auto;" +
+    "opacity:0;font-size:13px;color:#FF641E;" +
+    "background:rgba(255,255,255,0.85);padding:2px 8px;border-radius:4px;" +
+    "white-space:nowrap;transition:opacity 0.2s;user-select:none;" +
+    "cursor:pointer;";
+  shadowRoot.appendChild(hintEl);
+
+  let mouseTimer: number | null = null;
+  let lastX = -100, lastY = -100;
+  let isOverHint = false;
+
+  // 鼠标进入浮标 → 不隐藏
+  hintEl.addEventListener("mouseenter", () => {
+    isOverHint = true;
+    if (mouseTimer !== null) clearTimeout(mouseTimer);
+  });
+
+  // 鼠标离开浮标 → 800ms 后隐藏
+  hintEl.addEventListener("mouseleave", () => {
+    isOverHint = false;
+    if (mouseTimer !== null) clearTimeout(mouseTimer);
+    if (hintEl.style.opacity === "0") return;
+    mouseTimer = window.setTimeout(() => {
+      hintEl.style.opacity = "0";
+    }, 800);
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    lastX = e.clientX;
+    lastY = e.clientY;
+    if (mouseTimer !== null) clearTimeout(mouseTimer);
+    // 忽略浮标之外的其他 Shadow DOM 子元素事件
+    if (!isOverHint && e.target !== hintEl && !hintEl.contains(e.target as Node) && shadowRoot.contains(e.target as Node)) return;
+
+    // 鼠标在浮标上 → 不触发任何计时
+    if (isOverHint) return;
+
+    if (hintEl.style.opacity === "0") {
+      // 浮标隐藏 → 1s 无移动 → 显示
+      mouseTimer = window.setTimeout(() => {
+        if ((globalThis as Record<string, unknown>)[CORE_LOADED_FLAG]) return;
+        hintEl.style.left = `${lastX + 15}px`;
+        hintEl.style.top = `${lastY + 15}px`;
+        hintEl.style.opacity = "0.7";
+      }, 1000);
+    } else {
+      // 浮标显示 → 800ms 无移动 → 隐藏
+      mouseTimer = window.setTimeout(() => {
+        hintEl.style.opacity = "0";
+      }, 800);
+    }
+  });
+
+  hintEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (mouseTimer !== null) clearTimeout(mouseTimer);
+    hintEl.style.opacity = "0";
+    loadCore();
   });
 
   // 7. 将 mountPoint、portalTarget、template 加入 DOM（但 mountPoint 隐藏）

@@ -28,9 +28,10 @@ const injectHostVariables = async (shadowRoot: ShadowRoot) => {
     const response = await fetch(linkEl.href);
     const cssText = await response.text();
 
-    const hostStyles: string[] = [];
+    const baseLayerStyles: string[] = [];
+    const propertiesLayerStyles: string[] = [];
 
-    // 提取 :root 规则块 → 替换为 :host
+    // ── 1. 提取 :root 规则块 → 替换为 :host，包裹在 @layer base 中 ──
     let searchStart = 0;
     while (searchStart < cssText.length) {
       const rootIdx = cssText.indexOf(":root", searchStart);
@@ -51,13 +52,13 @@ const injectHostVariables = async (shadowRoot: ShadowRoot) => {
       const ruleBlock = cssText.slice(rootIdx, closeBrace);
       if (ruleBlock.includes("--")) {
         const modifiedBlock = ruleBlock.replace(/:root(,\s*\.\w[^{]*)?/g, ":host");
-        hostStyles.push(modifiedBlock);
+        baseLayerStyles.push(modifiedBlock);
       }
 
       searchStart = closeBrace;
     }
 
-    // 提取 *,:before,:after,::backdrop 规则块
+    // ── 2. 提取 *,::before,::after,::backdrop 规则块，包裹在 @layer properties 中 ──
     const universalRegex = /(?:^|}|;)\s*\*[,:{]/g;
     let universalMatch: RegExpExecArray | null;
     while ((universalMatch = universalRegex.exec(cssText)) !== null) {
@@ -78,15 +79,23 @@ const injectHostVariables = async (shadowRoot: ShadowRoot) => {
 
       const ruleBlock = cssText.slice(starIdx, closeBrace);
       if (ruleBlock.includes("--tw-")) {
-        hostStyles.push(ruleBlock);
+        const modifiedBlock = ruleBlock.replace(/^[^{]+{/, ":host{");
+        propertiesLayerStyles.push(modifiedBlock);
       }
 
       universalRegex.lastIndex = closeBrace;
     }
 
-    if (hostStyles.length > 0) {
+    if (baseLayerStyles.length > 0 || propertiesLayerStyles.length > 0) {
       const styleEl = document.createElement("style");
-      styleEl.textContent = hostStyles.join("\n");
+      const parts: string[] = [];
+      if (baseLayerStyles.length > 0) {
+        parts.push(`@layer base{${baseLayerStyles.join("\n")}}`);
+      }
+      if (propertiesLayerStyles.length > 0) {
+        parts.push(`@layer properties{${propertiesLayerStyles.join("\n")}}`);
+      }
+      styleEl.textContent = parts.join("\n");
       shadowRoot.appendChild(styleEl);
     }
   } catch {

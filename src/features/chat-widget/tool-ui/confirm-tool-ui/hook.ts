@@ -1,5 +1,5 @@
 // 确认工具面板逻辑
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { ToolCallMessagePartProps } from "@assistant-ui/react";
 import type { ActionResult, ActionCall } from "@/features/action-executor/action-types";
 import { executeAction } from "@/features/action-executor/action-executor";
@@ -35,43 +35,21 @@ export function useConfirmTool(
   result?: ActionResult
 ) {
   const portalTarget = usePortalTarget();
-  // 如果已有结果（虚拟列表回收后重新挂载），不显示确认面板
   const [isOpen, setIsOpen] = useState(() => result === undefined);
-  const [resolved, setResolved] = useState(false);
   const [executing, setExecuting] = useState(false);
+  // 本地执行结果（不依赖 adapter resume 流程，直接在前端显示）
+  const [localResult, setLocalResult] = useState<ActionResult | null>(null);
 
-  // 已有结果时返回结果信息
-  const hasResult = result !== undefined;
-  const resultSuccess = result?.success ?? false;
+  // 已有结果时返回结果信息（优先本地结果，其次 props result）
+  const displayResult = localResult ?? result;
+  const hasResult = displayResult !== undefined;
+  const resultSuccess = displayResult?.success ?? false;
   const resultMessage = useMemo(() => {
-    if (!result) return "";
-    return result.success
-      ? result.message ?? "Operation completed"
-      : result.message ?? result.error ?? "Operation failed";
-  }, [result]);
-
-  // 销毁面板并回传结果的统一出口
-  const resolveWith = useCallback(
-    (res: ActionResult | ToolResponse<ActionResult>) => {
-      if (resolved) return;
-      setResolved(true);
-      setIsOpen(false);
-      addResult(res);
-    },
-    [resolved, addResult]
-  );
-
-  // portalTarget 为 null 时自动回传错误，避免工具调用永远挂起
-  useEffect(() => {
-    if (!portalTarget && !resolved && !hasResult) {
-      resolveWith(
-        new ToolResponse({
-          result: { success: false, error: "portal_missing", message: "Confirm UI portal target not found" },
-          isError: true
-        })
-      );
-    }
-  }, [portalTarget, resolved, resolveWith, hasResult]);
+    if (!displayResult) return "";
+    return displayResult.success
+      ? displayResult.message ?? "Operation completed"
+      : displayResult.message ?? displayResult.error ?? "Operation failed";
+  }, [displayResult]);
 
   // 构建 action description 文本
   const description = useMemo(() => {
@@ -86,14 +64,18 @@ export function useConfirmTool(
     return "Perform page action";
   }, [args]);
 
-  // 用户确认：先执行真实 DOM 操作，再回传执行结果
+  // 用户确认：立即关闭弹窗，异步执行 DOM 操作，结果本地显示
   const handleConfirm = useCallback(async () => {
-    if (resolved || executing) return;
+    if (executing || hasResult) return;
     setExecuting(true);
+    setIsOpen(false); // ← 立即销毁弹窗，不等 executeAction 完成
+
     try {
       const call = { tool: toolName, params: args } as ActionCall;
       const res = await executeAction(call);
-      resolveWith(
+      setLocalResult(res);
+      // 通知 runtime 工具已完成（仅用于解除 thread 的 pending 状态，不触发额外流程）
+      addResult(
         new ToolResponse({
           result: res,
           isError: !res.success,
@@ -102,21 +84,25 @@ export function useConfirmTool(
       );
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Action execution failed";
-      resolveWith(
+      const res: ActionResult = { success: false, error: "exception", message: errorMsg };
+      setLocalResult(res);
+      addResult(
         new ToolResponse({
-          result: { success: false, error: "exception", message: errorMsg },
+          result: res,
           isError: true
         })
       );
     } finally {
       setExecuting(false);
     }
-  }, [resolved, executing, toolName, args, resolveWith]);
+  }, [executing, hasResult, toolName, args, addResult]);
 
-  // 用户取消
+  // 用户取消：关闭弹窗，本地显示取消状态
   const handleCancel = useCallback(() => {
-    resolveWith({ success: false, error: "user_cancelled", message: "User cancelled the operation" });
-  }, [resolveWith]);
+    setIsOpen(false);
+    setLocalResult({ success: false, error: "user_cancelled", message: "User cancelled the operation" });
+    addResult({ success: false, error: "user_cancelled", message: "User cancelled the operation" });
+  }, [addResult]);
 
   // 点击遮罩 → 视为取消
   const handleBackdropClick = useCallback(() => {

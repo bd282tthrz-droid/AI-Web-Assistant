@@ -1,12 +1,20 @@
-import { MessagePrimitive, MessagePartPrimitive, ThreadPrimitive, SuggestionPrimitive } from "@assistant-ui/react";
+import { MessagePrimitive, MessagePartPrimitive, ThreadPrimitive, SuggestionPrimitive, ErrorPrimitive } from "@assistant-ui/react";
 import { useActionBarCopy } from "@assistant-ui/core/react";
 import { useActionBarReload } from "@assistant-ui/core/react";
 import { useAuiState } from "@assistant-ui/store";
-import { useState, useCallback, type FC } from "react";
+import { useState, useCallback, useEffect, useRef, type FC } from "react";
 import { MessageActions } from "@/components/elements/message-actions";
 import type { Reaction } from "@/components/elements/message-actions";
-import { HermesThinking } from "@/components/hermes-thinking";
 import { StreamingText, type Segment } from "@/components/assistant-ui/elements/streaming-text";
+import Thinking from "@/components/thinking";
+import { wfError } from "@/services/dify/dify-error-state";
+import { createDebugLogger } from "@/utils/debug-log";
+import { useNodeProgress } from "@/services/dify/node-progress-store";
+import { ReasoningRoot, ReasoningTrigger, ReasoningContent, ReasoningText } from "@/components/assistant-ui/elements/reasoning.aui";
+import { LoaderIcon, type LoaderIconHandle } from "@/components/ui/loader";
+import { ICONS } from "@/constants/icon";
+
+const debugLog = createDebugLogger("[chat-message-item]");
 
 // 消息内容渲染组件 - 使用 MessagePrimitive.Parts 自动渲染消息各部分
 const MessageContent: FC<{ isUser?: boolean }> = ({ isUser = true }) => {
@@ -33,7 +41,7 @@ const MessageContent: FC<{ isUser?: boolean }> = ({ isUser = true }) => {
 
               // 初始阶段还没有文本时，显示 thinking 指示器
               if (!text && isStreaming) {
-                return <HermesThinking state="thinking" className="text-xs text-[#FF641E]" />;
+                return <Thinking />;
               }
 
               return <StreamingText segments={segments} count={wordCount} streaming={isStreaming} />;
@@ -61,10 +69,41 @@ const UserMessage: FC = () => {
   );
 };
 
+// 节点进度条目组件（带动画加载图标）
+const NodeItem: FC<{ title: string; done: boolean }> = ({ title, done }) => {
+  const loaderRef = useRef<LoaderIconHandle>(null);
+
+  useEffect(() => {
+    if (!done) loaderRef.current?.startAnimation();
+  }, [done]);
+
+  return (
+    <div className="flex items-center gap-2 text-sm text-[#325f419f]">
+      <span className="shrink-0">{done ? <ICONS.check className="shrink-0 text-[#325f419f]" size={14} /> : <LoaderIcon ref={loaderRef} size={16} />}</span>
+      <span>{title}</span>
+    </div>
+  );
+};
+
 // 助手消息气泡
 const AssistantMessage: FC = () => {
   const [reaction, setReaction] = useState<Reaction>(null);
   const isRunning = useAuiState((s) => s.thread.isRunning);
+  const [error, setError] = useState<string | null>(null);
+  const { nodes, isActive: hasNodes } = useNodeProgress();
+
+  // 新消息发送时重置节点进度
+  useEffect(() => {
+    if (isRunning) useNodeProgress.getState().reset();
+  }, [isRunning]);
+
+  // 订阅工作流错误状态
+  useEffect(() => {
+    const unsub = wfError.subscribe(setError);
+    return () => {
+      unsub();
+    };
+  }, []);
 
   // 复制功能
   const { copy, isCopied } = useActionBarCopy({
@@ -80,10 +119,27 @@ const AssistantMessage: FC = () => {
   const handleRegenerate = useCallback(() => {
     if (!reloadDisabled) reload();
   }, [reload, reloadDisabled]);
-
+  debugLog.log("error:", error);
   return (
     <MessagePrimitive.Root className="mt-6">
       <div className="rounded-2xl rounded-bl-sm bg-[#F5D2AF]/80 px-4 py-2.5 text-sm text-[#3C5F32] shadow-sm backdrop-blur-sm">
+        {error && (
+          <ErrorPrimitive.Root className="mb-3 rounded-lg border border-[#FF641E]/30 bg-[#FF641E]/10 px-3 py-2">
+            <ErrorPrimitive.Message className="text-sm text-[#FF641E]">❌ {error}</ErrorPrimitive.Message>
+          </ErrorPrimitive.Root>
+        )}
+        {nodes.length > 0 && (
+          <ReasoningRoot streaming={hasNodes} defaultOpen variant="outline" className="mb-3">
+            <ReasoningTrigger active={hasNodes} />
+            <ReasoningContent>
+              <ReasoningText>
+                {nodes.map((n, i) => (
+                  <NodeItem key={i} title={n.title} done={n.done} />
+                ))}
+              </ReasoningText>
+            </ReasoningContent>
+          </ReasoningRoot>
+        )}
         <MessageContent isUser={false} />
         {!isRunning && (
           <>

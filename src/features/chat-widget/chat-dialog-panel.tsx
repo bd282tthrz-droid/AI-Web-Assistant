@@ -1,5 +1,6 @@
 import { Button } from "@heroui/react";
 import { Ripple } from "m3-ripple";
+import { AiAssistantIcon } from "@/components/ui/ai-assistant-icon";
 import { ICONS } from "@/constants/icon";
 import ChatDialog from "./chat-dialog";
 import type { FC } from "react";
@@ -17,7 +18,7 @@ const ChatDialogPanel: FC<ChatDialogPanelProps> = ({ onClose }) => {
     <>
       <header className="flex items-center justify-between border-b border-white/10 bg-[#3C5F32]/40 px-4 py-3 backdrop-blur-lg">
         <div className="flex items-center gap-2">
-          <ICONS.robot size={20} className="text-[#F5D2AF]" />
+          <AiAssistantIcon size={20} className="text-[#F5D2AF]" />
           <h2 className="text-sm font-semibold text-[#F5D2AF]">AI Assistant</h2>
         </div>
         <Button isIconOnly variant="ghost" size="sm" onPress={onClose} aria-label="Close dialog" className="text-[#F5D2AF] hover:bg-[#FF641E]/20">

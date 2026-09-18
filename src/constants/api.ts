@@ -27,3 +27,9 @@ export const DIFY_CONFIG = {
   // 基础 URL
   BASE_URL: "https://dify.app.hicloudapp.com/v1"
 } as const;
+
+// 应用环境配置
+export const APP_ENV = {
+  // 是否为开发环境（Vite 编译时替换，生产构建后始终为 false）
+  IS_DEV: import.meta.env.DEV
+} as const;

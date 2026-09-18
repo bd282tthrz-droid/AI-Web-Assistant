@@ -84,24 +84,11 @@ const createDifyAdapter = (): ChatModelAdapter => ({
       (unstable_getMessage ? extractLastToolResult([unstable_getMessage()]) : null);
 
     if (toolResult) {
-      // ============ resume 分支 ============
-      // tool 已经由 runtime 的 toolkit 执行完毕（human tool 经用户确认，frontend tool 自动执行）
-      // result 已经由 runtime 写入 thread 内部的 tool-call part 上，不需要 adapter 再发 tool-result
-      //
-      // Dify 的处理方式：工具结果由前端直接消费（DOM 操作由 frontend executor 完成）
-      // 不需要额外通知 Dify（conversation 已经保存，用户可继续对话）
-      //
-      // adapter 这里只需 yield 一段人类可读的执行结果文本，写入聊天记录即可
-      debugLog.log("resume detected for tool:", toolResult.toolName, "callId:", toolResult.toolCallId.slice(0, 8));
-
-      // 按 ActionResult 结构构造展示文案
-      const r = toolResult.result as { success?: boolean; message?: string; error?: string };
-      const summary =
-        r?.success === true ? `✅ ${r.message ?? "Operation completed"}` : `❌ ${r?.message ?? r?.error ?? "Operation failed"}`;
-
-      yield {
-        content: [{ type: "text", text: summary }]
-      };
+      // ============ resume 分支（空操作）============
+      // 工具结果已由 ConfirmToolUI 直接在前端显示（localResult），
+      // 不需要通过 adapter yield 额外文本。
+      // runtime 收到 addResult 后可能调用此分支，直接跳过即可。
+      debugLog.log("resume skip for tool:", toolResult.toolName, "callId:", toolResult.toolCallId.slice(0, 8));
       return;
     }
 

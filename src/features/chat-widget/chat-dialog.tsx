@@ -1,8 +1,10 @@
 import { AssistantRuntimeProvider, ThreadPrimitive, ComposerPrimitive, AuiIf } from "@assistant-ui/react";
+import { useAuiState } from "@assistant-ui/store";
 import { useAssistant } from "@/hooks/use-assistant";
 import { ICONS } from "@/constants/icon";
 import { UserMessage, AssistantMessage } from "./chat-message-item";
-import type { FC } from "react";
+import { type FC } from "react";
+import { TwitchIcon } from "@/components/ui/twitch";
 
 // 对话区域组件 - 消息列表渲染
 // 使用 ThreadPrimitive.Viewport + Messages 官方方案
@@ -11,20 +13,13 @@ import type { FC } from "react";
 const ChatMessages: FC = () => {
   return (
     <div className="relative flex-1 overflow-hidden">
-      <ThreadPrimitive.Viewport
-        className="h-full px-4 overflow-y-auto custom-scrollbar"
-        autoScroll
-      >
-        <ThreadPrimitive.Messages>
-          {({ message }) =>
-            message.role === "user" ? <UserMessage /> : <AssistantMessage />
-          }
-        </ThreadPrimitive.Messages>
+      <ThreadPrimitive.Viewport className="h-full px-4 overflow-y-auto custom-scrollbar" autoScroll>
+        <ThreadPrimitive.Messages>{({ message }) => (message.role === "user" ? <UserMessage /> : <AssistantMessage />)}</ThreadPrimitive.Messages>
       </ThreadPrimitive.Viewport>
 
       <AuiIf condition={(s) => s.thread.isEmpty}>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 text-[#F5D2AF]/60">
-          <ICONS.message size={32} />
+          <TwitchIcon loop={true} size={32} />
           <p className="text-lg my-4">How can I help you?</p>
           <div className="pointer-events-auto mt-2 flex flex-wrap justify-center gap-2">
             <ThreadPrimitive.Suggestion
@@ -52,8 +47,9 @@ const ChatMessages: FC = () => {
   );
 };
 
-// 输入区域组件 - 输入框 + 发送按钮
+// 输入区域组件 - 输入框 + 发送/停止按钮
 const ChatComposer: FC = () => {
+  const isRunning = useAuiState((s) => s.thread.isRunning);
   return (
     <ComposerPrimitive.Root className="flex items-end gap-2 border-t border-white/10 bg-[#3C5F32]/40 p-3 backdrop-blur-lg">
       <ComposerPrimitive.Input
@@ -62,9 +58,15 @@ const ChatComposer: FC = () => {
         className="flex-1 resize-none rounded-lg border border-[#F5D2AF]/40 bg-[#F5D2AF] px-3 py-2 text-sm text-[#3C5F32] outline-none placeholder:text-[#3C5F32]/50"
         rows={1}
       />
-      <ComposerPrimitive.Send className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FF641E] text-white hover:bg-[#FF641E]/90 disabled:opacity-40">
-        <ICONS.paperPlane size={16} />
-      </ComposerPrimitive.Send>
+      {isRunning ? (
+        <ComposerPrimitive.Cancel className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FF641E] text-white hover:bg-[#FF641E]/90 cursor-pointer">
+          <ICONS.stop size={16} />
+        </ComposerPrimitive.Cancel>
+      ) : (
+        <ComposerPrimitive.Send className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FF641E] text-white hover:bg-[#FF641E]/90 disabled:opacity-40">
+          <ICONS.paperPlane size={16} />
+        </ComposerPrimitive.Send>
+      )}
     </ComposerPrimitive.Root>
   );
 };

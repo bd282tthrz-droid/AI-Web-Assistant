@@ -29,11 +29,53 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(
-    ellipse at 20% 0%,
-    rgba(255, 255, 255, 0.12) 0%,
-    transparent 60%
-  );
+  background: radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
   pointer-events: none;
   z-index: -1;
+}
+
+.thinking {
+  width: fit-content;
+  font-weight: bold;
+  font-family: monospace;
+  white-space: pre;
+  line-height: 1.2em;
+  height: 1.2em;
+  overflow: hidden;
+}
+
+.thinking:before {
+  content: "Processing\AAnalyzing\AComputing\AEvaluating\APondering";
+  white-space: pre;
+  display: inline-block;
+  animation: l39 2s infinite steps(5) alternate;
+}
+
+@keyframes l39 {
+  100% {
+    transform: translateY(-80%);
+  }
+}
+
+@custom-variant data-open (&:where([data-state="open"], [data-open]:not([data-open="false"])));
+
+@custom-variant data-closed (&:where([data-state="closed"], [data-closed]:not([data-closed="false"])));
+
+@theme inline {
+  @keyframes collapsible-down {
+  from {
+    height: 0;
+    }
+  to {
+    height: var(--radix-collapsible-content-height, var(--collapsible-panel-height, auto));
+    }
+  }
+  @keyframes collapsible-up {
+  from {
+    height: var(--radix-collapsible-content-height, var(--collapsible-panel-height, auto));
+    }
+  to {
+    height: 0;
+    }
+  }
 }

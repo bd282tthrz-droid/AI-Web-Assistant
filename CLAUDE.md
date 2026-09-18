@@ -81,6 +81,36 @@ v3 API 与 v2 有重大变化，禁止凭记忆使用 v2 写法：
 - 业务逻辑抽离至 src/hooks/use-xxx.ts
 - 文件命名 kebab-case，Hook 文件 use- 开头，Schema 文件 .schema.ts 结尾
 - 单文件不超过 150 行
+- **Barrel Pattern（目录导出模式）**：当单文件超过 150 行或职责不单一时，应拆分为同名目录，原文件作为 `index.ts` 入口，子模块按职责拆分到独立文件中。外部引用路径保持不变（TypeScript 自动解析 `path/` → `path/index.ts`）。注意：文件 → 目录转换后需重启 Vite dev server 清除路径缓存。示例：
+
+  ```
+  # 改前（单文件）
+  services/dify/dify-chat-transport.ts
+
+  # 改后（目录）
+  services/dify/dify-chat-transport/
+  ├── index.ts           ← 对外入口（只做编排 + 导出）
+  ├── provider.ts        ← 子模块（Provider 创建）
+  └── stream-utils.ts    ← 子模块（工具函数）
+  ```
+
+- **类型分支处理规范**：当需要根据类型（`type` / `event` 等字段）做分支处理且分支数 ≥ 3 时，禁止使用 `if-else` 链。必须采用**工厂 + 策略映射表**（`Record<type, handler>`）模式。违反此规则会导致代码难以扩展和维护。示例：
+
+  ```ts
+  // ❌ 禁止：if-else 链
+  if (type === "a") { /* ... */ }
+  else if (type === "b") { /* ... */ }
+  else if (type === "c") { /* ... */ }
+
+  // ✅ 正确：工厂 + 映射表
+  const handlers: Record<string, Handler> = {
+    a: () => { /* ... */ },
+    b: () => { /* ... */ },
+    c: () => { /* ... */ },
+  };
+  const handler = handlers[type];
+  handler?.(data);
+  ```
 
 ## 目录结构
 

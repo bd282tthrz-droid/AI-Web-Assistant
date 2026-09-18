@@ -6,7 +6,6 @@ import { executeNavigate } from "./actions/navigate-action";
 import { executeHighlight } from "./actions/highlight-action";
 import type { ActionCall, ActionResult, ActionParams } from "./action-types";
 import { createDebugLogger } from "@/utils/debug-log";
-import { setLastActionResult } from "@/services/dify/dify-conversation";
 import { invalidatePageContextCache } from "@/features/page-context/page-context-extractor";
 
 // Action 执行器 - 工具调用调度中心
@@ -66,9 +65,8 @@ export const executeAction = async (call: ActionCall): Promise<ActionResult> => 
       error: "unknown_tool",
       message: `Unknown tool: ${call.tool}`
     };
-    setLastActionResult(JSON.stringify(result));
     return result;
-  }
+    }
 
   const params = buildActionParams(call);
   debugLog.log(`[executeAction] tool=${call.tool} params=`, params);
@@ -76,7 +74,6 @@ export const executeAction = async (call: ActionCall): Promise<ActionResult> => 
   debugLog.log(`[executeAction] result=`, result);
   // action 执行后页面 DOM 已变化，清除页面上下文缓存
   invalidatePageContextCache();
-  setLastActionResult(JSON.stringify(result));
   return result;
 };
 

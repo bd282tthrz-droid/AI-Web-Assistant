@@ -26,6 +26,8 @@ import {
   FaStar,
   FaPlus,
   FaMinus,
+  FaStop,
+  FaCheck,
 } from 'react-icons/fa6'
 
 export const ICONS = {
@@ -63,4 +65,6 @@ export const ICONS = {
   star: FaStar,
   plus: FaPlus,
   minus: FaMinus,
+  stop: FaStop,
+  check: FaCheck,
 } as const

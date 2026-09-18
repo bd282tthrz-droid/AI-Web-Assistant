@@ -4,11 +4,12 @@ import FabButton from "./fab-button";
 import ChatDialogPanel from "./chat-dialog-panel";
 import type { FC } from "react";
 import { createDebugLogger } from "@/utils/debug-log";
+import { APP_ENV } from "@/constants/api";
 
 // 聊天 Widget 顶层容器 - 管理 FAB + 对话框的打开/关闭状态
 const debugLog = createDebugLogger("[chat-widget]");
 const ChatWidget: FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(!APP_ENV.IS_DEV);
 
   const handleToggle = () => {
     debugLog.log("load");

@@ -40,10 +40,13 @@ const injectHostVariables = async (shadowRoot: ShadowRoot, cssUrl: string) => {
     const response = await fetch(cssUrl);
     const cssText = await response.text();
 
-    const hostStyles: string[] = [];
+    const baseLayerStyles: string[] = [];
+    const propertiesLayerStyles: string[] = [];
 
-    // ── 1. 提取 :root 规则块 → 替换为 :host ──
+    // ── 1. 提取 :root 规则块 → 替换为 :host，包裹在 @layer base 中 ──
     // 手动扫描 CSS 文本，找到所有 :root 规则块
+    // 将 :root 替换为 :host，使变量在 Shadow DOM 中可用
+    // 注入到 @layer base 中，保持与 <link> 样式表一致的层叠优先级（无层 vs 有层的问题）
     let searchStart = 0;
     while (searchStart < cssText.length) {
       const rootIdx = cssText.indexOf(":root", searchStart);
@@ -66,29 +69,26 @@ const injectHostVariables = async (shadowRoot: ShadowRoot, cssUrl: string) => {
 
       if (ruleBlock.includes("--")) {
         const modifiedBlock = ruleBlock.replace(/:root(,\s*\.\w[^{]*)?/g, ":host");
-        hostStyles.push(modifiedBlock);
+        baseLayerStyles.push(modifiedBlock);
       }
 
       searchStart = closeBrace;
     }
 
-    // ── 2. 提取 *,::before,::after,::backdrop 规则块 ──
+    // ── 2. 提取 *,::before,::after,::backdrop 规则块，包裹在 @layer properties 中 ──
     // TailwindCSS v4 将 --tw-* 内部变量定义在此选择器中，作为 @property 的回退
-    // 但它被包裹在 @supports(-webkit-hyphens:none) 条件内，现代浏览器不满足
-    // 提取后直接注入到 Shadow DOM，不依赖 @supports 条件
-    // 通过正则匹配以 * 开头（前面是 } 或 ; 或字符串开头）的规则块
+    // 但它被包裹在 @supports 条件内，现代浏览器不满足
+    // 提取后直接注入到 Shadow DOM，不依赖 @supports 条件，
+    // 并将选择器从 * 改为 :host，避免在 Shadow DOM 每个元素上重复声明变量
     const universalRegex = /(?:^|}|;)\s*\*[,:{]/g;
     let universalMatch: RegExpExecArray | null;
     while ((universalMatch = universalRegex.exec(cssText)) !== null) {
-      // 从匹配起始位置查找 * 的精确位置
       const starIdx = cssText.indexOf("*", universalMatch.index);
       if (starIdx === -1 || starIdx >= universalMatch.index + universalMatch[0].length) continue;
 
-      // 找到 { 开始位置
       const openBrace = cssText.indexOf("{", starIdx);
       if (openBrace === -1) continue;
 
-      // 找到匹配的 }
       let depth = 1;
       let closeBrace = openBrace + 1;
       while (depth > 0 && closeBrace < cssText.length) {
@@ -100,18 +100,24 @@ const injectHostVariables = async (shadowRoot: ShadowRoot, cssUrl: string) => {
 
       const ruleBlock = cssText.slice(starIdx, closeBrace);
 
-      // 只提取包含 --tw- 变量声明的规则块
       if (ruleBlock.includes("--tw-")) {
-        hostStyles.push(ruleBlock);
+        const modifiedBlock = ruleBlock.replace(/^[^{]+{/, ":host{");
+        propertiesLayerStyles.push(modifiedBlock);
       }
 
-      // 跳过已处理的部分，避免死循环
       universalRegex.lastIndex = closeBrace;
     }
 
-    if (hostStyles.length > 0) {
+    if (baseLayerStyles.length > 0 || propertiesLayerStyles.length > 0) {
       const styleEl = document.createElement("style");
-      styleEl.textContent = hostStyles.join("\n");
+      const parts: string[] = [];
+      if (baseLayerStyles.length > 0) {
+        parts.push(`@layer base{${baseLayerStyles.join("\n")}}`);
+      }
+      if (propertiesLayerStyles.length > 0) {
+        parts.push(`@layer properties{${propertiesLayerStyles.join("\n")}}`);
+      }
+      styleEl.textContent = parts.join("\n");
       shadowRoot.appendChild(styleEl);
     }
   } catch {
@@ -153,7 +159,7 @@ const init = () => {
   // 4. 创建 Portal 目标节点（ConfirmToolUI 弹窗渲染目标）
   const portalTarget = document.createElement("div");
   portalTarget.id = PORTAL_ID;
-  portalTarget.style.cssText = "position:absolute;z-index:50;";
+  portalTarget.style.cssText = "inset:0;z-index:50;";
   //shadowRoot.appendChild(portalTarget);
 
   // 5. 创建 React 挂载点
