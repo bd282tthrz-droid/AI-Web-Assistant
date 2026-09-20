@@ -13,6 +13,9 @@ import { useNodeProgress } from "@/services/dify/node-progress-store";
 import { ReasoningRoot, ReasoningTrigger, ReasoningContent, ReasoningText } from "@/components/assistant-ui/elements/reasoning.aui";
 import { LoaderIcon, type LoaderIconHandle } from "@/components/ui/loader";
 import { ICONS } from "@/constants/icon";
+import { useStoppedState } from "@/services/dify/stopped-state";
+import { StoppedRun } from "@/components/assistant-ui/elements/stopped-run";
+import { useAui } from "@assistant-ui/store";
 
 const debugLog = createDebugLogger("[chat-message-item]");
 
@@ -91,11 +94,31 @@ const AssistantMessage: FC = () => {
   const isRunning = useAuiState((s) => s.thread.isRunning);
   const [error, setError] = useState<string | null>(null);
   const { nodes, isActive: hasNodes } = useNodeProgress();
+  const { isStopped, set: setStopped } = useStoppedState();
+  const aui = useAui();
+  const messages = useAuiState((s) => s.thread.messages);
 
-  // 新消息发送时重置节点进度
+  // 新消息发送时重置进度与停止状态
   useEffect(() => {
-    if (isRunning) useNodeProgress.getState().reset();
-  }, [isRunning]);
+    if (isRunning) {
+      useNodeProgress.getState().reset();
+      setStopped(false);
+    }
+  }, [isRunning, setStopped]);
+
+  // 提取当前助理消息文本
+  const lastAssistantText = (() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg.role === "assistant") {
+        return msg.content
+          .filter((p): p is { type: "text"; text: string } => p.type === "text")
+          .map((p) => p.text)
+          .join(" ");
+      }
+    }
+    return "";
+  })();
 
   // 订阅工作流错误状态
   useEffect(() => {
@@ -141,6 +164,14 @@ const AssistantMessage: FC = () => {
           </ReasoningRoot>
         )}
         <MessageContent isUser={false} />
+        {!isRunning && isStopped && (
+          <StoppedRun
+            words={[lastAssistantText]}
+            reason="Stopped"
+            onContinue={handleRegenerate}
+            onDiscard={() => aui.thread.deleteMessage(messages.filter((m) => m.role === "assistant").at(-1)?.id ?? "")}
+          />
+        )}
         {!isRunning && (
           <>
             <div className="flex flex-col">

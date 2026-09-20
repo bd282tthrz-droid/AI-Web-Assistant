@@ -8,6 +8,13 @@ import { useNodeProgress } from "../node-progress-store";
 const DIFY_BASE_URL = DIFY_CONFIG.BASE_URL;
 const debugLog = createDebugLogger("[dify-chat-transport]");
 
+// 模块级停止信号（由 index.ts 设置，用于干净关闭流而非抛错）
+let _stopSignal: AbortSignal | null = null;
+
+export const setStopSignal = (signal: AbortSignal | null) => {
+  _stopSignal = signal;
+};
+
 // 创建 provider 时指定正确的 base URL，避免默认值 https://api.dify.ai/v1 导致 401
 // 使用自定义 fetch 拦截 SSE 流：将 node_started.title 注入为 message 事件，显示工作流节点进度
 // 注意：依赖 patches/dify-ai-provider+1.1.1.patch 修复 fetch 参数传递 bug
@@ -42,6 +49,11 @@ export const difyProvider = createDifyProvider({
       async start(controller) {
         try {
           while (true) {
+            // 用户主动停止时干净关闭流
+            if (_stopSignal?.aborted) {
+              controller.close();
+              return;
+            }
             const { done, value } = await reader.read();
             if (done) {
               useNodeProgress.getState().complete();
@@ -84,6 +96,11 @@ export const difyProvider = createDifyProvider({
             }
           }
         } catch (err) {
+          // 用户主动停止或 AbortError → 干净关闭，不触发外部错误处理
+          if (err instanceof Error && err.name === "AbortError") {
+            controller.close();
+            return;
+          }
           controller.error(err);
         } finally {
           reader.releaseLock();

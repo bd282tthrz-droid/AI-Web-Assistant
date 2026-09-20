@@ -5,6 +5,7 @@ import { ICONS } from "@/constants/icon";
 import { UserMessage, AssistantMessage } from "./chat-message-item";
 import { type FC } from "react";
 import { TwitchIcon } from "@/components/ui/twitch";
+import { cancelStream } from "@/services/dify/dify-chat-transport";
 
 // 对话区域组件 - 消息列表渲染
 // 使用 ThreadPrimitive.Viewport + Messages 官方方案
@@ -55,15 +56,18 @@ const ChatComposer: FC = () => {
       <ComposerPrimitive.Input
         placeholder="Type a message..."
         submitMode="enter"
-        className="flex-1 resize-none rounded-lg border border-[#F5D2AF]/40 bg-[#F5D2AF] px-3 py-2 text-sm text-[#3C5F32] outline-none placeholder:text-[#3C5F32]/50"
+        className="flex-1 resize-none rounded-lg border border-[#F5D2AF]/40 bg-[#3C5F32] px-3 py-2 text-sm text-[#F5D2AF] outline-none placeholder:text-[#F5D2AF]/50"
         rows={1}
       />
       {isRunning ? (
-        <ComposerPrimitive.Cancel className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FF641E] text-white hover:bg-[#FF641E]/90 cursor-pointer">
+        <button
+          onClick={cancelStream}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F5D2AF] text-[#3C5F32] hover:text-[#FF641E] cursor-pointer"
+        >
           <ICONS.stop size={16} />
-        </ComposerPrimitive.Cancel>
+        </button>
       ) : (
-        <ComposerPrimitive.Send className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FF641E] text-white hover:bg-[#FF641E]/90 disabled:opacity-40">
+        <ComposerPrimitive.Send className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F5D2AF] text-[#3C5F32] hover:text-[#FF641E] disabled:opacity-40">
           <ICONS.paperPlane size={16} />
         </ComposerPrimitive.Send>
       )}

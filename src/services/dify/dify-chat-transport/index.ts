@@ -6,7 +6,9 @@ import { toolkit } from "@/features/action-executor/toolkit";
 import { DIFY_CONFIG } from "@/constants/api";
 import { createDebugLogger } from "@/utils/debug-log";
 import { wfError } from "../dify-error-state";
-import { difyProvider } from "./provider";
+import { useNodeProgress } from "../node-progress-store";
+import { useStoppedState } from "../stopped-state";
+import { difyProvider, setStopSignal } from "./provider";
 import { createErrorStream, buildDifyInputs, createLogTransform, createDedupTransform } from "./stream-utils";
 
 // Dify ChatTransport 实现
@@ -14,6 +16,14 @@ import { createErrorStream, buildDifyInputs, createLogTransform, createDedupTran
 // 供 @assistant-ui/react-ai-sdk 的 useChatRuntime 使用
 
 const debugLog = createDebugLogger("[dify-chat-transport]");
+
+// 模块级停止控制器
+let _stopController: AbortController | null = null;
+
+export const cancelStream = () => {
+  useStoppedState.getState().set(true);
+  _stopController?.abort();
+};
 
 export class DifyChatTransport implements ChatTransport<UIMessage> {
   async sendMessages(
@@ -112,6 +122,10 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
         },
       };
 
+      // 创建停止控制器，只控制 fetch 层，不影响 streamText 的状态管理
+      _stopController = new AbortController();
+      setStopSignal(_stopController.signal);
+
       const result = streamText({
         model: difyProvider("dify-chat", {
           apiKey: DIFY_CONFIG.API_KEY,
@@ -150,14 +164,19 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
           }
         },
         (err) => {
-          if (err instanceof Error && err.name === "AbortError") return;
+          const isUserCancel = err instanceof Error &&
+            (err.name === "AbortError" || err.name === "AI_NoOutputGeneratedError");
+          if (isUserCancel) return;
           debugLog.error("[conversationId] extraction failed:", err);
         },
       );
 
       return uiMessageStream;
     } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") {
+      const isUserCancel = err instanceof Error &&
+        (err.name === "AbortError" || err.name === "AI_NoOutputGeneratedError");
+      if (isUserCancel) {
+        useNodeProgress.getState().complete();
         debugLog.log("sendMessages cancelled by user");
         return createErrorStream("");
       }

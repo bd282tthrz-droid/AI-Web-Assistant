@@ -7,6 +7,15 @@ import App from "./App.tsx";
 import "./utils/dev-test-helper";
 
 import { createDebugLogger } from "@/utils/debug-log";
+
+// 过滤 AI SDK 内部 abort 时的未捕获异常，避免 DevTools 显示红色错误
+window.addEventListener("unhandledrejection", (e) => {
+  if (e.reason instanceof Error &&
+    (e.reason.name === "AbortError" || e.reason.name === "AI_NoOutputGeneratedError")) {
+    e.preventDefault();
+  }
+});
+
 const debugLog = createDebugLogger("[main]");
 // 开发模式：初始化 Shadow DOM 容器，模拟 UMD 嵌入的 Shadow DOM 环境
 if (import.meta.env.DEV) {
