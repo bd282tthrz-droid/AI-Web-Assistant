@@ -1,0 +1,1 @@
+export { default as MessageContent } from "./message-content";

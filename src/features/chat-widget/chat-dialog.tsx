@@ -2,7 +2,8 @@ import { AssistantRuntimeProvider, ThreadPrimitive, ComposerPrimitive, AuiIf } f
 import { useAuiState } from "@assistant-ui/store";
 import { useAssistant } from "@/hooks/use-assistant";
 import { ICONS } from "@/constants/icon";
-import { UserMessage, AssistantMessage } from "./chat-message-item";
+import { UserMessage } from "./user-message";
+import { AssistantMessage } from "./assistant-message";
 import { type FC } from "react";
 import { TwitchIcon } from "@/components/ui/twitch";
 import { cancelStream } from "@/services/dify/dify-chat-transport";
@@ -12,6 +13,7 @@ import { cancelStream } from "@/services/dify/dify-chat-transport";
 // Viewport 自带 autoScroll 自动跟随流式输出
 // AuiIf 处理空状态
 const ChatMessages: FC = () => {
+  console.log("ChatMessages");
   return (
     <div className="relative flex-1 overflow-hidden">
       <ThreadPrimitive.Viewport className="h-full px-4 overflow-y-auto custom-scrollbar" autoScroll>
@@ -51,6 +53,7 @@ const ChatMessages: FC = () => {
 // 输入区域组件 - 输入框 + 发送/停止按钮
 const ChatComposer: FC = () => {
   const isRunning = useAuiState((s) => s.thread.isRunning);
+  console.log("isRunning:", isRunning);
   return (
     <ComposerPrimitive.Root className="flex items-end gap-2 border-t border-white/10 bg-[#3C5F32]/40 p-3 backdrop-blur-lg">
       <ComposerPrimitive.Input
@@ -62,8 +65,7 @@ const ChatComposer: FC = () => {
       {isRunning ? (
         <button
           onClick={cancelStream}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F5D2AF] text-[#3C5F32] hover:text-[#FF641E] cursor-pointer"
-        >
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F5D2AF] text-[#3C5F32] hover:text-[#FF641E] cursor-pointer">
           <ICONS.stop size={16} />
         </button>
       ) : (

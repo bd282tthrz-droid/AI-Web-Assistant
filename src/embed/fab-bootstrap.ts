@@ -162,7 +162,8 @@ const init = () => {
   shadowRoot.appendChild(hintEl);
 
   let mouseTimer: number | null = null;
-  let lastX = -100, lastY = -100;
+  let lastX = -100,
+    lastY = -100;
   let isOverHint = false;
 
   // 鼠标进入浮标 → 不隐藏

@@ -9,7 +9,7 @@ interface MouseHintProps {
   readonly onOpen: () => void;
 }
 
-const IDLE_DELAY = 1500; // 鼠标静止多久后显示 (ms)
+const IDLE_DELAY = 1000; // 鼠标静止多久后显示 (ms)
 const HIDE_DELAY = 800; // 鼠标移动后多久隐藏 (ms)
 
 const MouseHint: FC<MouseHintProps> = ({ onOpen }) => {
@@ -120,8 +120,7 @@ const MouseHint: FC<MouseHintProps> = ({ onOpen }) => {
             zIndex: 2147483646,
             cursor: "pointer"
           }}
-          className="select-none whitespace-nowrap rounded-md bg-white/85 px-2.5 py-1 text-sm text-[#FF641E] shadow-sm backdrop-blur-sm"
-        >
+          className="select-none whitespace-nowrap rounded-md bg-white/85 px-2.5 py-1 text-sm text-[#FF641E] shadow-sm backdrop-blur-sm">
           ❓ Ask AI
         </motion.div>
       )}
