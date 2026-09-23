@@ -7,15 +7,21 @@ import { MessageActions } from "@/components/elements/message-actions";
 import type { Reaction } from "@/components/elements/message-actions";
 import { createDebugLogger } from "@/utils/debug-log";
 import { useNodeProgress } from "@/services/dify/node-progress-store";
+import { useMessageNodeStore } from "@/services/dify/message-node-store";
 import { useStoppedState } from "@/services/dify/stopped-state";
 import NodeProgressPanel from "./node-progress-panel";
 import ErrorPanel from "./error-panel";
 import StoppedRunPanel from "./stopped-run-panel";
 import { MessageContent } from "../message-content";
+import { SUGGESTIONS } from "@/constants/suggestion";
 
-const debugLog = createDebugLogger("[chat-message-item]");
+const debugLog = createDebugLogger("[assistant-message]");
 
-const AssistantMessage: FC = () => {
+interface AssistantMessageProps {
+  readonly messageId: string;
+}
+
+const AssistantMessage: FC<AssistantMessageProps> = ({ messageId }) => {
   const [reaction, setReaction] = useState<Reaction>(null);
   const isRunning = useAuiState((s) => s.thread.isRunning);
 
@@ -24,6 +30,12 @@ const AssistantMessage: FC = () => {
     if (isRunning) {
       useNodeProgress.getState().reset();
       useStoppedState.getState().set(false);
+    } else {
+      // 流结束 → 保存节点快照（messageId 已由 props 传入）
+      const currentNodes = useNodeProgress.getState().nodes;
+      if (messageId && currentNodes.length > 0) {
+        useMessageNodeStore.getState().saveNodes(messageId, currentNodes);
+      }
     }
   }, [isRunning]);
 
@@ -31,7 +43,7 @@ const AssistantMessage: FC = () => {
   const { copy, isCopied } = useActionBarCopy({
     copyToClipboard: async (text: string) => {
       await navigator.clipboard.writeText(text);
-    },
+    }
   });
 
   // 重新生成功能
@@ -42,26 +54,25 @@ const AssistantMessage: FC = () => {
     if (!reloadDisabled) reload();
   }, [reload, reloadDisabled]);
 
-  debugLog.log("AssistantMessage");
   return (
     <MessagePrimitive.Root className="mt-6">
       <div className="rounded-2xl rounded-bl-sm bg-[#F5D2AF]/80 px-4 py-2.5 text-sm text-[#3C5F32] shadow-sm backdrop-blur-sm">
         <ErrorPanel />
-        <NodeProgressPanel />
+        <NodeProgressPanel messageId={messageId} />
         <MessageContent isUser={false} />
         <StoppedRunPanel onContinue={handleRegenerate} />
         {!isRunning && (
           <>
             <div className="flex flex-col">
-              <ThreadPrimitive.Suggestions>
-                {() => (
-                  <SuggestionPrimitive.Trigger
-                    send
-                    className="mt-2 rounded-lg border border-[#3C5F32]/20 bg-[#F5D2AF]/40 px-3 py-2 text-sm text-[#3C5F32]/70 hover:bg-[#E2DED9]/50 cursor-pointer transition-colors">
-                    <SuggestionPrimitive.Title />
-                  </SuggestionPrimitive.Trigger>
-                )}
-              </ThreadPrimitive.Suggestions>
+              {SUGGESTIONS.map((suggestion) => (
+                <ThreadPrimitive.Suggestion
+                  key={suggestion.prompt}
+                  className="mt-2 rounded-lg border border-[#3C5F32]/20 bg-[#F5D2AF]/40 px-3 py-2 text-sm text-[#3C5F32]/70 hover:bg-[#E2DED9]/50 cursor-pointer transition-colors"
+                  prompt={suggestion.prompt}
+                  send>
+                  {suggestion.title}
+                </ThreadPrimitive.Suggestion>
+              ))}
             </div>
             <MessageActions
               className="mt-2 justify-end"

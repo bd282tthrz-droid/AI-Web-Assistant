@@ -24,7 +24,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   },
   {
     name: "fill_input",
-    description: "Fill content into an input field, such as search box, form field, etc. Auto-presses Enter after filling to trigger search/submit. (auto-execute)",
+    description: "Fill content into an input/search field. For search boxes, this auto-presses Enter after filling to trigger search. For form fields, use batch_fill instead.",
     arguments: {
       data_attributes: "data-* attribute selector (e.g. [data-assistant-action='search-input'])",
       css_selector: "PRIMARY selector - direct CSS selector from the interactive elements table's '最佳选择器' column",
@@ -60,6 +60,22 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       text_match: "Visible text of the element. Fill from '元素文本' column.",
       anchor_context: "FALLBACK only - JSON: { anchorText: 'anchor text', targetSelector: 'simple tag name' }"
     }
+  },
+  {
+    name: "batch_fill",
+    description: "Fill multiple form fields at once with a single user confirmation. Use this for inquiry forms, checkout forms, registration forms, etc. Does NOT submit the form. (requires user confirmation)",
+    arguments: {
+      fields: "JSON array of field objects: [{\"css_selector\": \"#fullname\", \"value\": \"John\"}, {\"css_selector\": \"#email\", \"value\": \"john@example.com\"}]. Each field uses standard element selectors (css_selector, text_match, data_attributes)."
+    }
+  },
+  {
+    name: "submit_form",
+    description: "Submit the form containing the specified element (auto-execute)",
+    arguments: {
+      css_selector: "CSS selector of any element inside the target form",
+      text_match: "Visible text of any element inside the target form",
+      data_attributes: "data-* attribute of any element inside the target form"
+    }
   }
 ] as const;
 
@@ -94,5 +110,7 @@ Parameters: ${JSON.stringify(tool.arguments)}`
 3. Parameter values must be strings (except anchor_context which is a JSON object)
 4. Element location priority: css_selector > text_match > data_attributes > anchor_context
 5. Use anchor_context ONLY when css_selector and text_match cannot uniquely identify the element (e.g. product cards with identical buttons)
-6. click_element and navigate_to require user confirmation before execution
-7. fill_input, scroll_to, and highlight_element execute automatically`.trim();
+6. click_element, navigate_to, and batch_fill require user confirmation before execution
+7. fill_input, submit_form, scroll_to, and highlight_element execute automatically
+8. Use batch_fill (not fill_input) when the user wants to fill multiple fields in a form
+9. After batch_fill, use submit_form to submit the form if the user asks`.trim();

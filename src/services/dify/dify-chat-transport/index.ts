@@ -45,9 +45,7 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
           return {
             ...msg,
             // 保留 text 和 tool-result，移除 tool-call
-            content: msg.content.filter(
-              (part) => !(typeof part === "object" && "type" in part && part.type === "tool-call")
-            ),
+            content: msg.content.filter((part) => !(typeof part === "object" && "type" in part && part.type === "tool-call"))
           };
         }
         return msg;
@@ -58,9 +56,7 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
       if (
         lastAssistantMsg &&
         Array.isArray(lastAssistantMsg.content) &&
-        lastAssistantMsg.content.some(
-          (part) => typeof part === "object" && part !== null && "type" in part && part.type === "tool-result"
-        )
+        lastAssistantMsg.content.some((part) => typeof part === "object" && part !== null && "type" in part && part.type === "tool-result")
       ) {
         const toolResultParts = lastAssistantMsg.content.filter(
           (part) => typeof part === "object" && part !== null && "type" in part && part.type === "tool-result"
@@ -78,9 +74,9 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
                 output:
                   typeof rawOutput === "string"
                     ? { type: "text" as const, value: rawOutput }
-                    : { type: "text" as const, value: JSON.stringify(rawOutput ?? "") },
+                    : { type: "text" as const, value: JSON.stringify(rawOutput ?? "") }
               };
-            }),
+            })
           } as unknown as ModelMessage);
         }
       }
@@ -102,24 +98,28 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
       const tools: Record<string, { description: string; inputSchema: z.ZodType }> = {
         click_element: {
           description: toolkit.click_element.description,
-          inputSchema: toolkit.click_element.parameters as z.ZodType,
+          inputSchema: toolkit.click_element.parameters as z.ZodType
         },
         navigate_to: {
           description: toolkit.navigate_to.description,
-          inputSchema: toolkit.navigate_to.parameters as z.ZodType,
+          inputSchema: toolkit.navigate_to.parameters as z.ZodType
         },
         fill_input: {
           description: toolkit.fill_input.description,
-          inputSchema: toolkit.fill_input.parameters as z.ZodType,
+          inputSchema: toolkit.fill_input.parameters as z.ZodType
         },
         scroll_to: {
           description: toolkit.scroll_to.description,
-          inputSchema: toolkit.scroll_to.parameters as z.ZodType,
+          inputSchema: toolkit.scroll_to.parameters as z.ZodType
         },
         highlight_element: {
           description: toolkit.highlight_element.description,
-          inputSchema: toolkit.highlight_element.parameters as z.ZodType,
+          inputSchema: toolkit.highlight_element.parameters as z.ZodType
         },
+        batch_fill: {
+          description: toolkit.batch_fill.description,
+          inputSchema: toolkit.batch_fill.parameters as z.ZodType
+        }
       };
 
       // 创建停止控制器，只控制 fetch 层，不影响 streamText 的状态管理
@@ -131,7 +131,7 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
           apiKey: DIFY_CONFIG.API_KEY,
           responseMode: "streaming" as const,
           injectToolsPrompt: false,
-          inputs: buildDifyInputs(),
+          inputs: buildDifyInputs()
         }),
         messages: filteredModelMessages,
         tools,
@@ -139,8 +139,8 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
         headers: {
           "chat-id": getConversationId() ?? "",
           "user-id": getSessionId(),
-          ...(headers as Record<string, string>),
-        },
+          ...(headers as Record<string, string>)
+        }
       });
 
       // 管道串联：去重 → 日志 → UIMessageChunk 流
@@ -148,15 +148,13 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
       const dedupStream = result.stream.pipeThrough(createDedupTransform(debugLog));
       const dedupLogStream = dedupStream.pipeThrough(logTransform);
       const uiMessageStream = toUIMessageStream({
-        stream: dedupLogStream,
+        stream: dedupLogStream
       });
 
       // 异步提取并保存 conversationId
       result.finalStep.then(
         (step) => {
-          const difyWorkflowData = step.providerMetadata?.difyWorkflowData as
-            | { conversationId?: string }
-            | undefined;
+          const difyWorkflowData = step.providerMetadata?.difyWorkflowData as { conversationId?: string } | undefined;
           const conversationId = difyWorkflowData?.conversationId;
           if (conversationId) {
             setConversationId(conversationId);
@@ -164,17 +162,15 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
           }
         },
         (err) => {
-          const isUserCancel = err instanceof Error &&
-            (err.name === "AbortError" || err.name === "AI_NoOutputGeneratedError");
+          const isUserCancel = err instanceof Error && (err.name === "AbortError" || err.name === "AI_NoOutputGeneratedError");
           if (isUserCancel) return;
           debugLog.error("[conversationId] extraction failed:", err);
-        },
+        }
       );
 
       return uiMessageStream;
     } catch (err) {
-      const isUserCancel = err instanceof Error &&
-        (err.name === "AbortError" || err.name === "AI_NoOutputGeneratedError");
+      const isUserCancel = err instanceof Error && (err.name === "AbortError" || err.name === "AI_NoOutputGeneratedError");
       if (isUserCancel) {
         useNodeProgress.getState().complete();
         debugLog.log("sendMessages cancelled by user");

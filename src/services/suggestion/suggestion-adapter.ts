@@ -1,3 +1,4 @@
+import { SUGGESTIONS } from "@/constants/suggestion";
 import type { SuggestionAdapter, ThreadSuggestion } from "@assistant-ui/react";
 
 /**
@@ -7,10 +8,6 @@ import type { SuggestionAdapter, ThreadSuggestion } from "@assistant-ui/react";
  */
 export const suggestionAdapter: SuggestionAdapter = {
   generate: async (): Promise<readonly ThreadSuggestion[]> => {
-    return [
-      { title: "More products", prompt: "Show me more products" },
-      { title: "Return policy", prompt: "What's your return policy?" },
-      { title: "Promotions", prompt: "Do you have any promotions?" },
-    ];
-  },
+    return SUGGESTIONS;
+  }
 };

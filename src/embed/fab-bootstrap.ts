@@ -92,7 +92,7 @@ const init = () => {
   // 3. 创建 Portal 目标节点（ConfirmToolUI 弹窗渲染目标，暂不加入 DOM）
   const portalTarget = document.createElement("div");
   portalTarget.id = PORTAL_ID;
-  portalTarget.style.cssText = "position:absolute;z-index:50;";
+  portalTarget.style.cssText = "z-index:50;";
 
   // 4. 创建 React 挂载点（隐藏，核心包加载后使用）
   const mountPoint = document.createElement("div");

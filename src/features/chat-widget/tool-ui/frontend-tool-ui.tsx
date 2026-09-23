@@ -18,6 +18,7 @@ const TOOL_LABEL_MAP: Record<string, string> = {
   fill_input: "Fill Input",
   scroll_to: "Scroll Page",
   highlight_element: "Highlight Element",
+  submit_form: "Submit Form",
 };
 
 // frontend tool 状态显示组件
@@ -29,10 +30,10 @@ const FrontendToolUI = ({ toolName, args, result, status }: ToolCallMessagePartP
   // 执行中
   if (statusType === "running") {
     return (
-      <div className="flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-600">
-        <ICONS.loading className="animate-spin" size={14} />
-        <span>Executing: {label}</span>
-        {args.value && <span className="text-blue-400">→ {args.value}</span>}
+      <div className="mt-2 flex items-center gap-2 rounded-lg border border-[#3C5F32]/15 bg-[#F5D2AF]/60 px-3 py-2 text-sm text-[#3C5F32]">
+        <ICONS.loading className="animate-spin shrink-0 text-[#FF641E]" size={14} />
+        <span className="font-medium">{label}</span>
+        {args.value && <span className="text-[#3C5F32]/60">→ {args.value}</span>}
       </div>
     );
   }
@@ -43,21 +44,24 @@ const FrontendToolUI = ({ toolName, args, result, status }: ToolCallMessagePartP
     const message = result?.message ?? "Completed";
 
     return (
-      <div
-        className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs ${
-          isSuccess ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
-        }`}
-      >
-        {isSuccess ? <ICONS.success size={14} /> : <ICONS.error size={14} />}
-        <span>{message}</span>
+      <div className="mt-2 rounded-lg border border-[#3C5F32]/15 bg-[#F5D2AF]/60 px-3 py-2 text-sm">
+        <div className="flex items-center gap-2">
+          {isSuccess
+            ? <ICONS.success className="shrink-0 text-[#3C5F32]" size={14} />
+            : <ICONS.error className="shrink-0 text-[#FF641E]" size={14} />
+          }
+          <span className={isSuccess ? "text-[#3C5F32]" : "text-[#FF641E]"}>
+            {message}
+          </span>
+        </div>
       </div>
     );
   }
 
   // 默认状态
   return (
-    <div className="flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-500">
-      <ICONS.wandMagic size={14} />
+    <div className="mt-2 flex items-center gap-2 rounded-lg border border-[#3C5F32]/10 bg-[#F5D2AF]/40 px-3 py-2 text-sm text-[#3C5F32]/60">
+      <ICONS.wandMagic className="shrink-0" size={14} />
       <span>{label}</span>
     </div>
   );

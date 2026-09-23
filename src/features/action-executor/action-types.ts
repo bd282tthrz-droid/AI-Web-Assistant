@@ -1,6 +1,15 @@
 // Action 共享类型定义
 // 内部类型，用 TS 原生 interface/type
 
+// 批量填充字段定义
+export interface FieldDef {
+  readonly css_selector?: string
+  readonly text_match?: string
+  readonly data_attributes?: string
+  readonly anchor_context?: string
+  readonly value: string
+}
+
 // Action 执行参数
 export interface ActionParams {
   /** 已解析的目标元素（由 action-resolver 提供） */
@@ -11,6 +20,8 @@ export interface ActionParams {
   readonly url?: string
   /** 滚动位置（scroll action 使用） */
   readonly position?: 'top' | 'bottom'
+  /** 批量填充字段列表（batch_fill 使用） */
+  readonly fields?: readonly FieldDef[]
 }
 
 // Action 执行结果
@@ -42,6 +53,8 @@ export interface ActionCall {
     readonly value?: string
     readonly url?: string
     readonly position?: 'top' | 'bottom'
+    // 批量填充字段
+    readonly fields?: readonly FieldDef[]
   }
   /** 是否需要用户确认（默认 false） */
   readonly confirmRequired?: boolean

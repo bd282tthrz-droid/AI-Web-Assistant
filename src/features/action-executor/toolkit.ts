@@ -25,6 +25,15 @@ const elementArgsSchema = z.object({
   css_selector: z.string().optional(),
 });
 
+// 批量填充字段 schema（与 FieldDef 对齐）
+const fieldSchema = z.object({
+  css_selector: z.string().optional(),
+  text_match: z.string().optional(),
+  data_attributes: z.string().optional(),
+  anchor_context: z.string().optional(),
+  value: z.string(),
+});
+
 const toolkit = defineToolkit({
   // human tool：点击元素，需要用户确认
   // 说明：assistant-ui 类型系统强制：type: "human" 的工具不允许定义 execute 字段
@@ -48,10 +57,20 @@ const toolkit = defineToolkit({
     render: ConfirmToolUI
   },
 
+  // human tool：批量填充表单，需要用户确认
+  batch_fill: {
+    type: "human",
+    description: "Fill multiple form fields at once. Use this for inquiry forms, checkout forms, etc.",
+    parameters: z.object({
+      fields: z.array(fieldSchema)
+    }),
+    render: ConfirmToolUI
+  },
+
   // frontend tool：填充输入框，自动执行
   fill_input: {
     type: "frontend",
-    description: "Fill content into an input field, such as search box, form field, etc. Auto-presses Enter after filling to trigger search/submit.",
+    description: "Fill content into an input/search field. For search boxes, this auto-presses Enter after filling to trigger search.",
     parameters: elementArgsSchema.extend({
       value: z.string()
     }),
@@ -64,6 +83,24 @@ const toolkit = defineToolkit({
           text_match: args.text_match,
           css_selector: args.css_selector,
           value: args.value
+        }
+      }),
+    render: FrontendToolUI
+  },
+
+  // frontend tool：提交表单，自动执行
+  submit_form: {
+    type: "frontend",
+    description: "Submit the form containing the specified element",
+    parameters: elementArgsSchema,
+    execute: async (args): Promise<ActionResult> =>
+      executeAction({
+        tool: "submit_form",
+        params: {
+          data_attributes: args.data_attributes,
+          anchor_context: args.anchor_context,
+          text_match: args.text_match,
+          css_selector: args.css_selector
         }
       }),
     render: FrontendToolUI
@@ -110,6 +147,6 @@ const toolkit = defineToolkit({
 });
 
 // 需要用户确认的工具列表（传入 unstable_humanToolNames）
-export const HUMAN_TOOL_NAMES = ["click_element", "navigate_to"] as const;
+export const HUMAN_TOOL_NAMES = ["click_element", "navigate_to", "batch_fill"] as const;
 
 export { toolkit };

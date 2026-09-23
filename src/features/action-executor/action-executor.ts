@@ -1,9 +1,12 @@
 import { resolveElement } from "./action-resolver";
 import { executeClick } from "./actions/click-action";
 import { executeFill } from "./actions/fill-action";
+import { executeFillField } from "./actions/fill-field-action";
+import { executeSubmitForm } from "./actions/submit-form-action";
 import { executeScroll } from "./actions/scroll-action";
 import { executeNavigate } from "./actions/navigate-action";
 import { executeHighlight } from "./actions/highlight-action";
+import { batchFillFields } from "./form-actions";
 import type { ActionCall, ActionResult, ActionParams } from "./action-types";
 import { createDebugLogger } from "@/utils/debug-log";
 import { invalidatePageContextCache } from "@/features/page-context/page-context-extractor";
@@ -17,13 +20,21 @@ const debugLog = createDebugLogger("[action-executor]");
 const ACTION_HANDLERS: Record<string, ActionHandler> = {
   click_element: executeClick,
   fill_input: executeFill,
+  fill_field: executeFillField,
+  submit_form: executeSubmitForm,
   scroll_to: executeScroll,
   navigate_to: executeNavigate,
-  highlight_element: executeHighlight
+  highlight_element: executeHighlight,
+  batch_fill: async (params: ActionParams) => batchFillFields({ fields: params.fields ?? [] })
 };
 
 // 解析元素并构建 ActionParams
 const buildActionParams = (call: ActionCall): ActionParams => {
+  // batch_fill 不需要元素解析，直接传递 fields
+  if (call.tool === "batch_fill") {
+    return { fields: call.params.fields };
+  }
+
   // navigate_to 不需要元素解析
   if (call.tool === "navigate_to") {
     return { url: call.params.url };
@@ -33,6 +44,17 @@ const buildActionParams = (call: ActionCall): ActionParams => {
   if (call.tool === "scroll_to" && call.params.position) {
     return { position: call.params.position };
   }
+
+  // submit_form：只需要解析元素来定位 form
+  if (call.tool === "submit_form") {
+    const resolved = resolveElement({
+      dataAttributes: call.params.data_attributes,
+      cssSelector: call.params.css_selector,
+      textMatch: call.params.text_match,
+    });
+    return { element: resolved?.element };
+  }
+
   debugLog.log(call.params);
   // 其他工具需要解析目标元素（4 维策略）
   const resolved = resolveElement({

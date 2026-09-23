@@ -11,7 +11,7 @@ export const createErrorStream = (errorText: string): ReadableStream<UIMessageCh
       controller.enqueue({ type: "text-delta", id: "0", delta: errorText } as UIMessageChunk);
       controller.enqueue({ type: "text-end", id: "0" } as UIMessageChunk);
       controller.close();
-    },
+    }
   });
 };
 
@@ -21,7 +21,7 @@ export const buildDifyInputs = (): Record<string, string> => {
 
   return {
     ...contextInputs,
-    tools: TOOL_DEFINITIONS_JSON,
+    tools: TOOL_DEFINITIONS_JSON
   };
 };
 
@@ -36,16 +36,16 @@ export const createLogTransform = (logger: DebugLogger) =>
             JSON.stringify({
               id: (c as any).id,
               toolName: (c as any).toolName,
-              input: (c as any).input ?? (c as any).args,
-            }),
+              input: (c as any).input ?? (c as any).args
+            })
           ),
         "tool-input-delta": (c) =>
           logger.log(
             "[stream] tool-input-delta:",
             JSON.stringify({
               id: (c as any).id,
-              delta: (c as any).delta ?? (c as any).inputDelta,
-            }),
+              delta: (c as any).delta ?? (c as any).inputDelta
+            })
           ),
         "tool-input-end": (c) => logger.log("[stream] tool-input-end:", JSON.stringify({ id: (c as any).id })),
         "tool-call": (c) =>
@@ -54,22 +54,23 @@ export const createLogTransform = (logger: DebugLogger) =>
             JSON.stringify({
               toolName: (c as any).toolName,
               toolCallId: (c as any).toolCallId,
-              input: (c as any).input,
-            }),
+              input: (c as any).input
+            })
           ),
-        "text-delta": (c) =>
+        "tool-error": (c) =>
           logger.log(
-            "[stream] text-delta:",
-            JSON.stringify({ delta: (c as any).delta ?? (c as any).textDelta }),
+            "[stream] tool-error:",
+            JSON.stringify({
+              toolName: (c as any).toolName,
+              toolCallId: (c as any).toolCallId,
+              error: (c as any).error
+            })
           ),
+        "text-delta": (c) => logger.log("[stream] text-delta:", JSON.stringify({ delta: (c as any).delta ?? (c as any).textDelta })),
         "reasoning-start": () => logger.log("[stream] reasoning-start"),
-        "reasoning-delta": (c) =>
-          logger.log(
-            "[stream] reasoning-delta:",
-            JSON.stringify({ delta: (c as any).delta ?? (c as any).textDelta }),
-          ),
+        "reasoning-delta": (c) => logger.log("[stream] reasoning-delta:", JSON.stringify({ delta: (c as any).delta ?? (c as any).textDelta })),
         "reasoning-end": () => logger.log("[stream] reasoning-end"),
-        "finish-step": () => logger.log("[stream] finish-step"),
+        "finish-step": () => logger.log("[stream] finish-step")
       };
 
       const handler = logHandlers[chunk.type];
@@ -77,11 +78,10 @@ export const createLogTransform = (logger: DebugLogger) =>
       else logger.log("[stream] chunk type:", chunk.type);
 
       controller.enqueue(chunk);
-    },
+    }
   });
 
 // 创建工具调用去重流
-// 根因：Dify chatflow 同时触发 "message_end" 和 "workflow_finished" 事件
 // dify-ai-provider 在两个事件处理中都会调用 parseToolCalls 生成工具调用 chunks
 // 导致同一工具调用被输出两次（toolInputId 不同但 toolName + input 相同）
 export const createDedupTransform = (logger: DebugLogger) => {
@@ -133,6 +133,6 @@ export const createDedupTransform = (logger: DebugLogger) => {
       }
 
       controller.enqueue(chunk);
-    },
+    }
   });
 };

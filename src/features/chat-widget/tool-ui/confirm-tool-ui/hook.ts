@@ -20,12 +20,20 @@ interface ConfirmToolArgs {
   readonly text_match?: string;
   readonly css_selector?: string;
   readonly url?: string;
+  readonly fields?: ReadonlyArray<{
+    readonly css_selector?: string;
+    readonly text_match?: string;
+    readonly data_attributes?: string;
+    readonly anchor_context?: string;
+    readonly value: string;
+  }>;
 }
 
 // tool name to English label mapping
 const TOOL_LABEL_MAP: Record<string, string> = {
   click_element: "Click Element",
-  navigate_to: "Navigate"
+  navigate_to: "Navigate",
+  batch_fill: "Batch Fill Form"
 };
 
 export function useConfirmTool(
@@ -53,6 +61,14 @@ export function useConfirmTool(
 
   // 构建 action description 文本
   const description = useMemo(() => {
+    // batch_fill 使用简单文字描述，不展示字段明细
+    if (toolName === "batch_fill" && args.fields && args.fields.length > 0) {
+      const labelNames = args.fields
+        .map((f) => f.text_match ?? f.css_selector?.replace(/^[#.]/, "") ?? "field")
+        .join(", ");
+      return `Fill in the ${labelNames} with the provided details`;
+    }
+
     const context = typeof args.anchor_context === "string" && args.anchor_context !== "" ? JSON.parse(args.anchor_context).anchorText : args.anchor_context;
     if (args.url) return `Navigate to: ${args.url}`;
     if (args.data_attributes) return `Execute: ${args.data_attributes}`;
@@ -62,7 +78,7 @@ export function useConfirmTool(
     if (args.text_match) return `Click: ${args.text_match}`;
     if (args.css_selector) return `Operate: ${args.css_selector}`;
     return "Perform page action";
-  }, [args]);
+  }, [args, toolName]);
 
   // 用户确认：立即关闭弹窗，异步执行 DOM 操作，结果本地显示
   const handleConfirm = useCallback(async () => {

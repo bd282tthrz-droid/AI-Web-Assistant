@@ -77,6 +77,7 @@ export const difyProvider = createDifyProvider({
                   // 工作流完成/失败时标记节点完成
                   if (evt.event === "workflow_finished") {
                     useNodeProgress.getState().complete();
+
                     if (evt.data?.status === "failed") {
                       const fake = JSON.stringify({
                         event: "message",

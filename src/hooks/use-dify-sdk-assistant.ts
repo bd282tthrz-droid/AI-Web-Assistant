@@ -17,7 +17,7 @@ export const useDifySDKAssistant = () => {
   const runtime = useChatRuntime({
     transport,
     adapters: {
-      suggestion: suggestionAdapter,
+      suggestion: suggestionAdapter
     }
   });
 

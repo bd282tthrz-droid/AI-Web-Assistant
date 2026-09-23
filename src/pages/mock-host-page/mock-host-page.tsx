@@ -3,6 +3,7 @@ import { ICONS } from "@/constants/icon";
 import NavBar from "./nav-bar";
 import ProductCard, { type MockProduct } from "./product-card";
 import type { FC } from "react";
+import InquiryForm from "./inquiry-form";
 
 // Mock 商品数据 - 模拟电商网站商品
 const MOCK_PRODUCTS: MockProduct[] = [
@@ -102,6 +103,7 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
             <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
           ))}
         </div>
+        <InquiryForm />
         <div className="container mx-auto px-4 py-6">
           <div className="text-sm text-gray-500 mb-6 flex items-center space-x-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
