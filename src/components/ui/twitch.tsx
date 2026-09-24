@@ -23,7 +23,7 @@ const PATH_VARIANTS: (loop: boolean) => Variants = (loop) => ({
     pathLength: 1,
     pathOffset: 0,
     transition: {
-      duration: loop ? 1.4 : 0.4,
+      duration: loop ? 3.4 : 0.4,
       opacity: { duration: 0.1 }
     }
   },
@@ -32,9 +32,9 @@ const PATH_VARIANTS: (loop: boolean) => Variants = (loop) => ({
     pathLength: [0, 1],
     pathOffset: [1, 0],
     transition: {
-      duration: loop ? 1.6 : 0.6,
+      duration: loop ? 2.6 : 0.6,
       ease: "linear",
-      opacity: { duration: 0.1 },
+      opacity: { duration: 1.2 },
       repeat: Number.POSITIVE_INFINITY
     }
   }

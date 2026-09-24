@@ -9,8 +9,8 @@ interface MouseHintProps {
   readonly onOpen: () => void;
 }
 
-const IDLE_DELAY = 1000; // 鼠标静止多久后显示 (ms)
-const HIDE_DELAY = 800; // 鼠标移动后多久隐藏 (ms)
+const IDLE_DELAY = 600; // 鼠标静止多久后显示 (ms)
+const HIDE_DELAY = 400; // 鼠标移动后多久隐藏 (ms)
 
 const MouseHint: FC<MouseHintProps> = ({ onOpen }) => {
   const [visible, setVisible] = useState(false);

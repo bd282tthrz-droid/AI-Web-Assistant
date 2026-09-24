@@ -15,7 +15,7 @@ interface FabButtonProps {
 // 固定定位在右下角，z-index 最高确保不被遮挡
 const FabButton: FC<FabButtonProps> = ({ isOpen, onToggle }) => {
   return (
-    <div className="fixed bottom-6 right-6 z-[2147483647]">
+    <div className="fixed bottom-6 right-6 z-1">
       {/* 外层呼吸光环 */}
       {!isOpen && (
         <motion.div

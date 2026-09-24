@@ -166,7 +166,7 @@ const init = () => {
   // Shadow DOM 已提供样式隔离，无需 all:initial（避免影响 CSS 自定义属性继承）
   const mountPoint = document.createElement("div");
   mountPoint.id = MOUNT_ID;
-  mountPoint.style.cssText = "position:fixed;bottom:96px;right:10px;z-index:9999999;";
+  mountPoint.style.cssText = "position:fixed;bottom:0;right:0;z-index:9999999;";
 
   const template = document.createElement("div");
   mountPoint.appendChild(portalTarget);

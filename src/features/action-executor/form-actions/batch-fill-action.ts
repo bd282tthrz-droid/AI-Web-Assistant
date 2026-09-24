@@ -21,8 +21,9 @@ export const batchFillFields = async (params: BatchFillParams): Promise<ActionRe
     };
   }
 
-  const results: Array<{ field: string; success: boolean }> = [];
+  const results: Array<{ field: string; success: boolean; error?: string }> = [];
   let hasError = false;
+  let allNotFound = true;
 
   for (const field of fields) {
     // 1. 解析元素（4 维定位策略）
@@ -36,10 +37,11 @@ export const batchFillFields = async (params: BatchFillParams): Promise<ActionRe
     });
 
     if (!resolved?.element) {
-      results.push({ field: field.css_selector ?? field.text_match ?? "unknown", success: false });
+      results.push({ field: field.css_selector ?? field.text_match ?? "unknown", success: false, error: "not_found" });
       hasError = true;
       continue;
     }
+    allNotFound = false;
 
     // 2. 填充值
     const fillResult = await executeFillField({
@@ -64,7 +66,9 @@ export const batchFillFields = async (params: BatchFillParams): Promise<ActionRe
 
   return {
     success: !hasError,
-    message: `Filled ${filledCount}/${fields.length} fields${failedCount > 0 ? `, ${failedCount} failed` : ""}`,
+    message: allNotFound
+      ? "No form fields found on this page"
+      : `Filled ${filledCount}/${fields.length} fields${failedCount > 0 ? `, ${failedCount} failed` : ""}`,
     data: {
       results,
       filledCount,

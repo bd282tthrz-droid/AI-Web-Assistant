@@ -48,7 +48,7 @@ const NodeProgressPanel: FC<NodeProgressPanelProps> = ({ messageId }) => {
   if (persistedNodes !== undefined) {
     if (persistedNodes.length === 0) return null;
     return (
-      <ReasoningRoot streaming={false} defaultOpen variant="outline" className="mb-3">
+      <ReasoningRoot streaming={false} variant="outline" className="mb-3">
         <ReasoningTrigger active={false} />
         <ReasoningContent>
           <ReasoningText>
@@ -64,7 +64,7 @@ const NodeProgressPanel: FC<NodeProgressPanelProps> = ({ messageId }) => {
   // 无持久化数据、且当前正在流式 → 渲染实时进度
   if (streamingActive && streamingNodes.length > 0) {
     return (
-      <ReasoningRoot streaming={true} defaultOpen variant="outline" className="mb-3">
+      <ReasoningRoot streaming={true} variant="outline" className="mb-3">
         <ReasoningTrigger active={true} />
         <ReasoningContent>
           <ReasoningText>

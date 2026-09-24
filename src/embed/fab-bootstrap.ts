@@ -13,6 +13,17 @@ const CORE_LOADED_FLAG = "__web_assistant_core_loaded";
 const scriptSrc = (document.currentScript as HTMLScriptElement | null)?.src ?? "";
 const baseUrl = scriptSrc ? scriptSrc.replace(/\/[^/]+\.js$/, "/") : "";
 
+// 从 script 标签 data-* 属性读取用户配置
+const userConfig: Record<string, unknown> = {};
+try {
+  const script = document.currentScript as HTMLScriptElement | null;
+  const suggestionsRaw = script?.dataset.assistantSuggestions;
+  if (suggestionsRaw) userConfig.suggestions = JSON.parse(suggestionsRaw);
+} catch {
+  console.warn("[web-assistant] data-assistant-suggestions JSON parse failed, check the format (use double quotes)");
+}
+(globalThis as unknown as Record<string, unknown>).__web_assistant_config__ = userConfig;
+
 // FAB 按钮样式
 const FAB_STYLES = `
   #${CONTAINER_ID} {
@@ -97,7 +108,7 @@ const init = () => {
   // 4. 创建 React 挂载点（隐藏，核心包加载后使用）
   const mountPoint = document.createElement("div");
   mountPoint.id = MOUNT_ID;
-  mountPoint.style.cssText = "position:fixed;bottom:96px;right:10px;z-index:9999999;display:none;";
+  mountPoint.style.cssText = "position:fixed;bottom:0;right:0;z-index:9999999;display:none;";
 
   // 5. 创建模板容器（mountWidget 渲染到此容器，不影响 portalTarget 兄弟节点）
   const template = document.createElement("div");
@@ -179,7 +190,7 @@ const init = () => {
     if (hintEl.style.opacity === "0") return;
     mouseTimer = window.setTimeout(() => {
       hintEl.style.opacity = "0";
-    }, 800);
+    }, 400);
   });
 
   document.addEventListener("mousemove", (e) => {
@@ -199,12 +210,12 @@ const init = () => {
         hintEl.style.left = `${lastX + 15}px`;
         hintEl.style.top = `${lastY + 15}px`;
         hintEl.style.opacity = "0.7";
-      }, 1000);
+      }, 600);
     } else {
-      // 浮标显示 → 800ms 无移动 → 隐藏
+      // 浮标显示 → 400ms 无移动 → 隐藏
       mouseTimer = window.setTimeout(() => {
         hintEl.style.opacity = "0";
-      }, 800);
+      }, 400);
     }
   });
 

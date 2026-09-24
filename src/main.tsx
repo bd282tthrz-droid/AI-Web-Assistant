@@ -10,8 +10,7 @@ import { createDebugLogger } from "@/utils/debug-log";
 
 // 过滤 AI SDK 内部 abort 时的未捕获异常，避免 DevTools 显示红色错误
 window.addEventListener("unhandledrejection", (e) => {
-  if (e.reason instanceof Error &&
-    (e.reason.name === "AbortError" || e.reason.name === "AI_NoOutputGeneratedError")) {
+  if (e.reason instanceof Error && (e.reason.name === "AbortError" || e.reason.name === "AI_NoOutputGeneratedError")) {
     e.preventDefault();
   }
 });
@@ -28,7 +27,7 @@ if (import.meta.env.DEV) {
 
   const mountPoint = document.createElement("div");
   mountPoint.id = "shadow-mount";
-  mountPoint.style.cssText = "position:fixed;bottom:96px;right:10px";
+  mountPoint.style.cssText = "position:fixed;bottom:0;right:0";
   shadowRoot.appendChild(mountPoint);
 
   // 创建 Portal 目标节点，与 UMD 生产模式对齐

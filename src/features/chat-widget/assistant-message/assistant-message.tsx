@@ -13,7 +13,7 @@ import NodeProgressPanel from "./node-progress-panel";
 import ErrorPanel from "./error-panel";
 import StoppedRunPanel from "./stopped-run-panel";
 import { MessageContent } from "../message-content";
-import { SUGGESTIONS } from "@/constants/suggestion";
+import { getSuggestions } from "@/constants/suggestion";
 
 const debugLog = createDebugLogger("[assistant-message]");
 
@@ -64,7 +64,7 @@ const AssistantMessage: FC<AssistantMessageProps> = ({ messageId }) => {
         {!isRunning && (
           <>
             <div className="flex flex-col">
-              {SUGGESTIONS.map((suggestion) => (
+              {getSuggestions().map((suggestion) => (
                 <ThreadPrimitive.Suggestion
                   key={suggestion.prompt}
                   className="mt-2 rounded-lg border border-[#3C5F32]/20 bg-[#F5D2AF]/40 px-3 py-2 text-sm text-[#3C5F32]/70 hover:bg-[#E2DED9]/50 cursor-pointer transition-colors"

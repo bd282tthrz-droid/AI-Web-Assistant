@@ -164,7 +164,9 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
         (err) => {
           const isUserCancel = err instanceof Error && (err.name === "AbortError" || err.name === "AI_NoOutputGeneratedError");
           if (isUserCancel) return;
+          const errorText = err instanceof Error ? err.message : "Request failed, please try again later";
           debugLog.error("[conversationId] extraction failed:", err);
+          wfError.set(errorText);
         }
       );
 
