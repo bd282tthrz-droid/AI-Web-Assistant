@@ -5,6 +5,7 @@ import ChatDialogPanel from "./chat-dialog-panel";
 import MouseHint from "./mouse-hint";
 import FormHint from "./form-hint";
 import { FormFillProvider } from "./form-fill-context";
+import { QueryProvider } from "@/providers/QueryProvider";
 import type { FC } from "react";
 import { createDebugLogger } from "@/utils/debug-log";
 import { APP_ENV } from "@/constants/api";
@@ -31,7 +32,7 @@ const ChatWidget: FC = () => {
   }, []);
 
   return (
-    <>
+    <QueryProvider>
       {/* 浮动按钮 */}
 
       <FabButton isOpen={isOpen} onToggle={handleToggle} />
@@ -55,7 +56,7 @@ const ChatWidget: FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </QueryProvider>
   );
 };
 

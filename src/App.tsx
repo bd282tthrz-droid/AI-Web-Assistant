@@ -1,6 +1,8 @@
 import { createPortal } from "react-dom";
 import ChatWidget from "@/features/chat-widget/chat-widget";
 import MockHostPage from "@/pages/mock-host-page/mock-host-page";
+import { HistoryVerify } from "@/hooks/history-verify";
+import { QueryProvider } from "@/providers/QueryProvider";
 import { PortalTargetProvider } from "@/embed/portal-context";
 import { createDebugLogger } from "@/utils/debug-log";
 import { memo } from "react";
@@ -15,6 +17,9 @@ const App = memo(() => {
 
     return (
       <>
+        <QueryProvider>
+          <HistoryVerify />
+        </QueryProvider>
         <MockHostPage />
         {mountPoint &&
           portalTarget &&

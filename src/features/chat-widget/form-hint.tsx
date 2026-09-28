@@ -138,10 +138,10 @@ const FormHint: FC<FormHintProps> = ({ onOpen }) => {
       const el = currentFieldRef.current;
       if (!el) return;
       const type = detectFormType(el);
-      const label = el.getAttribute("placeholder") ?? el.getAttribute("aria-label") ?? (el as HTMLInputElement).name ?? type;
+      //const label = el.getAttribute("placeholder") ?? el.getAttribute("aria-label") ?? (el as HTMLInputElement).name ?? type;
       setHint(null);
       currentFieldRef.current = null;
-      onOpen(label);
+      onOpen(type);
     };
 
     el.addEventListener("mouseenter", onEnter);

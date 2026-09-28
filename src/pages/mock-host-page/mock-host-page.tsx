@@ -103,7 +103,32 @@ const MockHostPage: FC<MockHostPageProps> = ({ children }) => {
             <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
           ))}
         </div>
-        {/*      <InquiryForm /> */}
+        <form method="get" action="/search/">
+          <div className="top_search">
+            <label>
+              <input name="search_type" type="radio" defaultChecked value="2" />
+              Google Search{" "}
+            </label>
+            <label>
+              <input name="search_type" type="radio" value="0" />
+              Keyword Search
+            </label>
+          </div>
+          <div id="serachID" className="clear">
+            <input
+              type="search"
+              className="form-control"
+              id="topkeys"
+              placeholder="Please input keywords or cas ..."
+              name="q"
+              required
+              autoComplete="off"
+              minLength={2}
+            />
+            <button className="submit" title="Search"></button>
+          </div>
+        </form>
+        <InquiryForm />
         <div className="container mx-auto px-4 py-6">
           <div className="text-sm text-gray-500 mb-6 flex items-center space-x-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

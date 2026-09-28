@@ -8,9 +8,6 @@ export const API_ENDPOINTS = {
   // Dify 会话管理接口
   DIFY_CONVERSATIONS: "https://dify.app.hicloudapp.com/v1/conversations",
 
-  // Dify 会话消息历史
-  DIFY_MESSAGES: (conversationId: string) => `https://dify.app.hicloudapp.com/v1/messages?conversation_id=${conversationId}`,
-
   // Dify 删除会话
   DIFY_DELETE_CONVERSATION: (conversationId: string) => `https://dify.app.hicloudapp.com/v1/conversations/${conversationId}`,
 

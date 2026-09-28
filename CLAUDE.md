@@ -112,6 +112,19 @@ v3 API 与 v2 有重大变化，禁止凭记忆使用 v2 写法：
   handler?.(data);
   ```
 
+- **TanStack Query 使用规范**：所有服务端 API 请求必须使用 `@tanstack/react-query` 管理（参考 https://zread.ai/TanStack/query）。禁止在组件或 Hook 中直接使用 `fetch` 或 `ky` 请求并手动管理 loading/error/cache 状态。理由：统一缓存/去重/重试/状态管理，避免重复封装。Typical usage:
+  ```ts
+  import { useQuery } from "@tanstack/react-query";
+  import { kyInstance } from "@/services/api/client";
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["resource", id],
+    queryFn: () => kyInstance.get(`resource/${id}`).json<T>(),
+    enabled: !!id,
+    staleTime: 30_000,
+  });
+  ```
+
 ## 目录结构
 
 ```

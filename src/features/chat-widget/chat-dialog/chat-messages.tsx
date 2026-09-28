@@ -10,7 +10,14 @@ const ChatMessages: FC = () => {
     <div className="relative flex-1 overflow-hidden">
       <ThreadPrimitive.Viewport className="h-full px-4 overflow-y-auto custom-scrollbar" autoScroll>
         <ThreadPrimitive.Messages>
-          {({ message }) => (message.role === "user" ? <UserMessage /> : <AssistantMessage messageId={message.id} />)}
+          {/*  {({ message }) => (message.role === "user" ? <UserMessage /> : <AssistantMessage messageId={message.id} />)} */}
+          {({ message }) => {
+            console.log(message);
+            if (message.role === "user") {
+              return <UserMessage />;
+            }
+            return <AssistantMessage messageId={message.id} />;
+          }}
         </ThreadPrimitive.Messages>
       </ThreadPrimitive.Viewport>
 

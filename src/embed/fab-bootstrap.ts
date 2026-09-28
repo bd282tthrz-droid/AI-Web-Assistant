@@ -91,6 +91,7 @@ const init = () => {
   // 1. 创建 Shadow DOM 容器
   const host = document.createElement("div");
   host.id = CONTAINER_ID;
+  host.style.cssText = "position:relative;z-index:21474836479999999;";
   document.body.appendChild(host);
 
   const shadowRoot = host.attachShadow({ mode: "open" });
