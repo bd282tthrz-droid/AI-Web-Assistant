@@ -13,14 +13,21 @@ const ChatComposer: FC = () => {
   useEffect(() => {
     if (fieldLabel) {
       const isSearch = fieldLabel === "search" || fieldLabel.toLowerCase().includes("search");
+      let text: string;
       if (isSearch) {
         const query = fieldLabel.replace(/search/i, "").trim();
-        aui.composer.setText(`Help me search for ${query || "products"}`);
+        text = `Help me search for ${query || "products"}`;
       } else {
-        aui.composer.setText(`Please fill in the name as xxx, the phone number as xxx, the email as xxx@example.com`);
+        text = `Please fill in the name as xxx, the phone number as xxx, the email as xxx@example.com`;
+      }
+      // 安全调用 composer.setText（组件未就绪时静默跳过）
+      try {
+        aui.composer.setText(text);
+      } catch {
+        // composer 尚未初始化，忽略
       }
     }
-  }, [fieldLabel, aui.composer]);
+  }, [fieldLabel]);
 
   return (
     <ComposerPrimitive.Root className="flex items-end gap-2 border-t border-white/10 bg-[#3C5F32]/40 p-3 backdrop-blur-lg">

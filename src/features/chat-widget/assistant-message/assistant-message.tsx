@@ -1,7 +1,7 @@
-import { MessagePrimitive, ThreadPrimitive, SuggestionPrimitive } from "@assistant-ui/react";
+import { MessagePrimitive } from "@assistant-ui/react";
 import { useActionBarCopy } from "@assistant-ui/core/react";
 import { useActionBarReload } from "@assistant-ui/core/react";
-import { useAuiState } from "@assistant-ui/store";
+import { useAuiState, useAui } from "@assistant-ui/store";
 import { useState, useCallback, useEffect, type FC } from "react";
 import { MessageActions } from "@/components/elements/message-actions";
 import type { Reaction } from "@/components/elements/message-actions";
@@ -54,6 +54,15 @@ const AssistantMessage: FC<AssistantMessageProps> = ({ messageId }) => {
     if (!reloadDisabled) reload();
   }, [reload, reloadDisabled]);
 
+  const aui = useAui();
+
+  const handleSuggestion = useCallback(
+    (prompt: string) => {
+      aui.thread.append({ content: [{ type: "text", text: prompt }] });
+    },
+    [aui],
+  );
+
   return (
     <MessagePrimitive.Root className="mt-6">
       <div className="rounded-2xl rounded-bl-sm bg-[#F5D2AF]/80 px-4 py-2.5 text-sm text-[#3C5F32] shadow-sm backdrop-blur-sm">
@@ -65,13 +74,12 @@ const AssistantMessage: FC<AssistantMessageProps> = ({ messageId }) => {
           <>
             <div className="flex flex-col">
               {getSuggestions().map((suggestion) => (
-                <ThreadPrimitive.Suggestion
+                <button
                   key={suggestion.prompt}
-                  className="mt-2 rounded-lg border border-[#3C5F32]/20 bg-[#F5D2AF]/40 px-3 py-2 text-sm text-[#3C5F32]/70 hover:bg-[#E2DED9]/50 cursor-pointer transition-colors"
-                  prompt={suggestion.prompt}
-                  send>
+                  onClick={() => handleSuggestion(suggestion.prompt)}
+                  className="mt-2 w-full rounded-lg border border-[#3C5F32]/20 bg-[#F5D2AF]/40 px-3 py-2 text-sm text-[#3C5F32]/70 hover:bg-[#E2DED9]/50 cursor-pointer transition-colors text-left">
                   {suggestion.title}
-                </ThreadPrimitive.Suggestion>
+                </button>
               ))}
             </div>
             <MessageActions

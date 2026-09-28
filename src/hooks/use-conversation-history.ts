@@ -32,7 +32,7 @@ export const useConversationHistory = (): {
     const messages: MessageRepo["messages"] = [];
     let parentId: string | null = null;
 
-    for (const [index, row] of [...data.data].reverse().entries()) {
+    for (const [index, row] of data.data.entries()) {
       for (const [role, text] of [
         ["user", row.query],
         ["assistant", row.answer],
