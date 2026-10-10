@@ -28,5 +28,8 @@ export const DIFY_CONFIG = {
 // 应用环境配置
 export const APP_ENV = {
   // 是否为开发环境（Vite 编译时替换，生产构建后始终为 false）
-  IS_DEV: import.meta.env.DEV
+  IS_DEV: import.meta.env.DEV,
+  // Dify 对话 dev 标记默认值（通过 VITE_DIFY_DEV 环境变量配置）
+  // 宿主网站可通过 data-assistant-dev 覆盖此值
+  DIFY_DEV: import.meta.env.VITE_DIFY_DEV ?? "true",
 } as const;

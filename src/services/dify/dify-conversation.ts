@@ -1,6 +1,7 @@
 // Dify 会话管理
-// sessionStorage 存当前 Tab 会话，localStorage 存历史会话列表
+// sessionStorage 存当前 Tab 会话，localStorage 存历史会话列表 + 访客标识
 
+const VISITOR_ID_KEY = "ai-assist-visitor-id";
 const CONVERSATION_ID_KEY = "ai-assist-conversation-id";
 const SESSION_ID_KEY = "ai-assist-session-id";
 const HISTORY_KEY = "ai-assist-history";
@@ -12,6 +13,22 @@ interface ConversationHistoryItem {
   readonly lastMessage: string;
   readonly timestamp: number;
 }
+
+// ============ 访客标识（localStorage，跨会话持久） ============
+
+// 获取或生成持久化访客 ID（跨标签页/跨访问不变）
+export const getVisitorId = (): string => {
+  try {
+    const existing = localStorage.getItem(VISITOR_ID_KEY);
+    if (existing) return existing;
+
+    const id = `visitor_${crypto.randomUUID()}`;
+    localStorage.setItem(VISITOR_ID_KEY, id);
+    return id;
+  } catch {
+    return `visitor_${Date.now()}`;
+  }
+};
 
 // ============ 当前 Tab 会话管理（sessionStorage） ============
 
@@ -73,8 +90,14 @@ const loadHistory = (): ConversationHistoryItem[] => {
 };
 
 // 保存到历史列表（最新在前，最多保留 MAX_HISTORY 条）
+// 只有用户提供过 email 才真正写入，否则静默跳过
 export const saveToHistory = (conversationId: string, lastMessage: string): void => {
   try {
+    // 无 email 不存历史
+    const raw = localStorage.getItem("ai-assist-user-profile");
+    const profile = raw ? JSON.parse(raw) : {};
+    if (!profile.email) return;
+
     const history = loadHistory();
     const newItem: ConversationHistoryItem = {
       conversationId,

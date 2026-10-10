@@ -19,8 +19,10 @@ try {
   const script = document.currentScript as HTMLScriptElement | null;
   const suggestionsRaw = script?.dataset.assistantSuggestions;
   if (suggestionsRaw) userConfig.suggestions = JSON.parse(suggestionsRaw);
+  const devRaw = script?.dataset.assistantDev;
+  if (devRaw !== undefined) userConfig.dev = devRaw;
 } catch {
-  console.warn("[web-assistant] data-assistant-suggestions JSON parse failed, check the format (use double quotes)");
+  console.warn("[web-assistant] data-* attribute parse failed, check the format (use double quotes)");
 }
 (globalThis as unknown as Record<string, unknown>).__web_assistant_config__ = userConfig;
 

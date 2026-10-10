@@ -8,11 +8,12 @@ import { createDebugLogger } from "@/utils/debug-log";
 
 interface ChatDialogPanelProps {
   readonly onClose: () => void;
+  readonly onMinimize: () => void;
 }
 const debugLog = createDebugLogger("[chat-dialog-panel]");
 // 对话框面板 - header + 对话内容
 // 不包含动画逻辑，由父组件 chat-widget 控制出现/消失动画
-const ChatDialogPanel: FC<ChatDialogPanelProps> = ({ onClose }) => {
+const ChatDialogPanel: FC<ChatDialogPanelProps> = ({ onClose, onMinimize }) => {
   debugLog.log("load");
   return (
     <>
@@ -21,10 +22,16 @@ const ChatDialogPanel: FC<ChatDialogPanelProps> = ({ onClose }) => {
           <AiAssistantIcon size={20} className="text-[#F5D2AF]" />
           <h2 className="text-sm font-semibold text-[#F5D2AF]">AI Assistant</h2>
         </div>
-        <Button isIconOnly variant="ghost" size="sm" onPress={onClose} aria-label="Close dialog" className="text-[#F5D2AF] hover:bg-[#FF641E]/20">
-          <ICONS.close size={16} />
-          <Ripple />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button isIconOnly variant="ghost" size="sm" onPress={onMinimize} aria-label="Minimize" className="text-[#F5D2AF] hover:bg-[#FF641E]/20">
+            <ICONS.minus size={16} />
+            <Ripple />
+          </Button>
+          <Button isIconOnly variant="ghost" size="sm" onPress={onClose} aria-label="Close dialog" className="text-[#F5D2AF] hover:bg-[#FF641E]/20">
+            <ICONS.close size={16} />
+            <Ripple />
+          </Button>
+        </div>
       </header>
       <div className="flex-1 overflow-hidden">
         <ChatDialog />

@@ -1,13 +1,15 @@
 import { streamText, toUIMessageStream, convertToModelMessages } from "ai";
-import type { ChatTransport, ChatRequestOptions, UIMessage, UIMessageChunk, ModelMessage } from "ai";
+import type { ChatTransport, ChatRequestOptions, UIMessage, UIMessageChunk, ModelMessage, TextStreamPart } from "ai";
 import { z } from "zod";
-import { getConversationId, getSessionId, setConversationId, saveToHistory } from "../dify-conversation";
+import { getConversationId, getVisitorId, setConversationId, saveToHistory } from "../dify-conversation";
 import { toolkit } from "@/features/action-executor/toolkit";
 import { DIFY_CONFIG } from "@/constants/api";
 import { createDebugLogger } from "@/utils/debug-log";
 import { wfError } from "../dify-error-state";
 import { useNodeProgress } from "../node-progress-store";
 import { useStoppedState } from "../stopped-state";
+import { useDifyMessageStore } from "../dify-message-store";
+import { useNewMessageStore } from "../new-message-store";
 import { difyProvider, setStopSignal } from "./provider";
 import { createErrorStream, buildDifyInputs, createLogTransform, createDedupTransform } from "./stream-utils";
 
@@ -138,28 +140,50 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
         abortSignal,
         headers: {
           "chat-id": getConversationId() ?? "",
-          "user-id": getSessionId(),
+          "user-id": getVisitorId(),
           ...(headers as Record<string, string>)
         }
       });
 
-      // 管道串联：去重 → 日志 → UIMessageChunk 流
+      // 管道串联：去重 → 日志 → 响应ID捕获 → UIMessageChunk 流
       const logTransform = createLogTransform(debugLog);
       const dedupStream = result.stream.pipeThrough(createDedupTransform(debugLog));
       const dedupLogStream = dedupStream.pipeThrough(logTransform);
+
+      // 捕获 response-metadata（UIMessage ID = dify message_id 用于 feedback API）
+      let capturedResponseId: string | undefined;
+      const idCaptureStream = dedupLogStream.pipeThrough(
+        new TransformStream<TextStreamPart<any>, TextStreamPart<any>>({
+          transform(chunk, controller) {
+            const c = chunk as unknown as { type: string; id?: string };
+            if (c.type === "response-metadata" && c.id) {
+              capturedResponseId = c.id;
+              useNodeProgress.getState().setActiveMessage(c.id);
+            }
+            controller.enqueue(chunk);
+          }
+        })
+      );
+
       const uiMessageStream = toUIMessageStream({
-        stream: dedupLogStream
+        stream: idCaptureStream
       });
 
-      // 异步提取并保存 conversationId
+      // 异步提取并保存 conversationId 和 messageId 映射
       result.finalStep.then(
         (step) => {
-          const difyWorkflowData = step.providerMetadata?.difyWorkflowData as { conversationId?: string } | undefined;
+          const difyWorkflowData = step.providerMetadata?.difyWorkflowData as { conversationId?: string; messageId?: string } | undefined;
           const conversationId = difyWorkflowData?.conversationId;
           if (conversationId) {
             setConversationId(conversationId);
             saveToHistory(conversationId, "");
           }
+          const difyMessageId = difyWorkflowData?.messageId;
+          if (difyMessageId && capturedResponseId) {
+            useDifyMessageStore.getState().setDifyId(capturedResponseId, difyMessageId);
+          }
+          // 新消息完成时计数（用于最小化时 FAB 角标）
+          useNewMessageStore.getState().increment();
         },
         (err) => {
           const isUserCancel = err instanceof Error && (err.name === "AbortError" || err.name === "AI_NoOutputGeneratedError");

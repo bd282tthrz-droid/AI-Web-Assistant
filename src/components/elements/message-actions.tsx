@@ -36,6 +36,7 @@ export function MessageActions({
     <div data-slot="message-actions" className={cn("flex items-center gap-1", className)} {...props}>
       <button
         type="button"
+        title="copy"
         aria-label={copied ? "Copied response" : "Copy response"}
         onClick={onCopy}
         className={cn(buttonClassName, "grid place-items-center", copied && "text-emerald-500")}>
@@ -46,6 +47,7 @@ export function MessageActions({
         <>
           <button
             type="button"
+            title="helpful"
             aria-label="Mark response helpful"
             aria-pressed={reaction === "up"}
             onClick={() => onReactionChange?.(reaction === "up" ? null : "up")}
@@ -54,6 +56,7 @@ export function MessageActions({
           </button>
           <button
             type="button"
+            title="unhelpful"
             aria-label="Mark response unhelpful"
             aria-pressed={reaction === "down"}
             onClick={() => onReactionChange?.(reaction === "down" ? null : "down")}
@@ -63,13 +66,13 @@ export function MessageActions({
         </>
       )}
       {onReactionChange && (
-        <button type="button" aria-label="Regenerate response" onClick={onRegenerate} className={buttonClassName}>
+        <button type="button" title="regenerate" aria-label="Regenerate response" onClick={onRegenerate} className={buttonClassName}>
           <RefreshCwIcon className={cn("size-3.5", regenerating && "animate-spin motion-reduce:animate-none")} />
         </button>
       )}
 
       {onMore && (
-        <button type="button" aria-label="More response actions" onClick={onMore} className={buttonClassName}>
+        <button type="button" title="more" aria-label="More response actions" onClick={onMore} className={buttonClassName}>
           <EllipsisIcon className="size-3.5" />
         </button>
       )}

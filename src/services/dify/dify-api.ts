@@ -3,7 +3,7 @@
 
 import { createApiClient } from "@/services/api/client";
 import { DIFY_CONFIG } from "@/constants/api";
-import { getSessionId } from "./dify-conversation";
+import { getVisitorId } from "./dify-conversation";
 
 // ── 类型 ──
 
@@ -13,6 +13,7 @@ interface DifyMessageItem {
   readonly answer: string;
   readonly created_at: number;
   readonly conversation_id: string;
+  readonly feedback?: { readonly rating: "like" | "dislike" | null } | null;
 }
 
 interface MessagesResponse {
@@ -31,7 +32,7 @@ const getClient = () => {
       apiKey: DIFY_CONFIG.API_KEY,
       name: "Dify API",
     }).extend({
-      searchParams: { user: getSessionId() },
+      searchParams: { user: getVisitorId() },
     });
   }
   return _difyClient;
@@ -45,6 +46,7 @@ interface DifyMessageItem {
   readonly answer: string;
   readonly created_at: number;
   readonly conversation_id: string;
+  readonly feedback?: { readonly rating: "like" | "dislike" | null } | null;
 }
 
 interface MessagesResponse {
@@ -74,3 +76,18 @@ export const fetchConversationMessages = (
       },
     })
     .json<MessagesResponse>();
+
+/**
+ * 提交消息反馈（点赞/点踩）
+ * @param messageId - Dify 消息 ID
+ * @param rating - "like" | "dislike"
+ */
+export const submitFeedback = (
+  messageId: string,
+  rating: "like" | "dislike",
+) =>
+  getClient()
+    .post(`messages/${messageId}/feedbacks`, {
+      json: { rating, user: getVisitorId() },
+    })
+    .json();

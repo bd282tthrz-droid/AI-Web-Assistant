@@ -5,18 +5,15 @@ import { type FC } from "react";
 import { AiAssistantIcon } from "@/components/ui/ai-assistant-icon";
 import { ICONS } from "@/constants/icon";
 
-// FAB 浮动按钮 Props（内部 UI 类型，用 TS 原生）
 interface FabButtonProps {
   readonly isOpen: boolean;
   readonly onToggle: () => void;
+  readonly badgeCount: number;
 }
 
-// 浮动操作按钮 - 点击打开/关闭聊天对话框
-// 固定定位在右下角，z-index 最高确保不被遮挡
-const FabButton: FC<FabButtonProps> = ({ isOpen, onToggle }) => {
+const FabButton: FC<FabButtonProps> = ({ isOpen, onToggle, badgeCount }) => {
   return (
     <div className="fixed bottom-6 right-6 z-1">
-      {/* 外层呼吸光环 */}
       {!isOpen && (
         <motion.div
           className="pointer-events-none absolute inset-0 rounded-full bg-[#FF641E]"
@@ -39,7 +36,14 @@ const FabButton: FC<FabButtonProps> = ({ isOpen, onToggle }) => {
         className={`relative h-14 w-14 rounded-full bg-[#FF641E] text-white shadow-lg shadow-[#FF641E]/30 transition-transform hover:scale-105 hover:bg-[#FF641E]/90 ${
           !isOpen ? "[&_svg]:h-7 [&_svg]:w-7" : ""
         }`}>
-        {isOpen ? <ICONS.close size={20} /> : <AiAssistantIcon size={28} />}
+        <div className="relative">
+          {isOpen ? <ICONS.close size={20} /> : <AiAssistantIcon size={28} />}
+          {badgeCount > 0 && !isOpen && (
+            <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white leading-none">
+              {badgeCount > 99 ? "99+" : badgeCount}
+            </span>
+          )}
+        </div>
         <Ripple />
       </Button>
     </div>

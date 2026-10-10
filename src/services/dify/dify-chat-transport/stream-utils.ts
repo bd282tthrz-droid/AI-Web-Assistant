@@ -1,6 +1,7 @@
 import type { TextStreamPart, UIMessageChunk } from "ai";
 import { TOOL_DEFINITIONS_JSON } from "@/features/action-executor/action-tools";
 import { buildSharedContextInputs } from "@/hooks/assistant-core";
+import { APP_ENV } from "@/constants/api";
 import type { DebugLogger } from "@/utils/debug-log";
 
 // 创建错误流：返回只包含错误文本的 UIMessageChunk 流
@@ -15,13 +16,16 @@ export const createErrorStream = (errorText: string): ReadableStream<UIMessageCh
   });
 };
 
-// 构建 Dify inputs：页面上下文 + 工具定义
+// 构建 Dify inputs：页面上下文 + 工具定义 + 宿主环境标识
 export const buildDifyInputs = (): Record<string, string> => {
   const contextInputs = buildSharedContextInputs();
+  const config = (globalThis as unknown as Record<string, unknown>).__web_assistant_config__ as Record<string, unknown> | undefined;
+  const dev = config?.dev as string | undefined;
 
   return {
     ...contextInputs,
-    tools: TOOL_DEFINITIONS_JSON
+    tools: TOOL_DEFINITIONS_JSON,
+    dev: dev ?? APP_ENV.DIFY_DEV,
   };
 };
 
