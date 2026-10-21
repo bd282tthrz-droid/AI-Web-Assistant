@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PAGE_TEXT_SELECTORS } from "@/constants/page-summary";
 
 // 鼠标跟随浮标 - 助手关闭时在鼠标位置显示 "❓ Ask AI"
 // 与 fab-bootstrap.ts 中的预加载浮标完全独立
@@ -52,6 +53,14 @@ const MouseHint: FC<MouseHintProps> = ({ onOpen }) => {
 
       // 鼠标停在浮标上，不触发任何计时
       if (isOverRef.current) return;
+
+      // 正文区域由 PageSummaryHint（📄 Summarize page）接管，Ask AI 不在此显示
+      const target = e.target as HTMLElement;
+      if (target.closest?.(PAGE_TEXT_SELECTORS)) {
+        clearTimers();
+        if (visibleRef.current) hideHint();
+        return;
+      }
 
       clearTimers();
 

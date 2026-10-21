@@ -1,8 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, type FC } from "react";
-import { Button } from "@heroui/react";
+import { Button, TextField, Input, FieldError } from "@heroui/react";
 import { Ripple } from "m3-ripple";
 import { useUserProfile } from "@/services/dify/user-profile-store";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface InfoCardProps {
   readonly onDone: () => void;
@@ -14,7 +16,10 @@ const InfoCard: FC<InfoCardProps> = ({ onDone }) => {
   const setField = useUserProfile((s) => s.setField);
 
   const handleSave = () => {
-    if (email.trim()) setField("email", email.trim());
+    // 以 validate 同一套规则守卫提交，非法 email 不放行（FieldError 已展示错误）
+    const emailVal = email.trim();
+    if (emailVal && !EMAIL_REGEX.test(emailVal)) return;
+    if (emailVal) setField("email", emailVal);
     if (name.trim()) setField("name", name.trim());
     onDone();
   };
@@ -40,20 +45,31 @@ const InfoCard: FC<InfoCardProps> = ({ onDone }) => {
             <span>💾</span> Save your chat history
           </div>
           <p className="mt-2 text-xs leading-relaxed text-[#F5D2AF]/60">Your conversations will be saved so you can continue where you left off next time.</p>
-          <input
+          <TextField
             type="email"
-            placeholder="Email address *"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-4 w-full rounded-lg border border-[#F5D2AF]/30 bg-[#3C5F32]/80 px-3 py-2 text-sm text-[#F5D2AF] outline-none placeholder:text-[#F5D2AF]/40"
-          />
-          <input
-            type="text"
-            placeholder="Your name (so I can call you)"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-3 w-full rounded-lg border border-[#F5D2AF]/30 bg-[#3C5F32]/80 px-3 py-2 text-sm text-[#F5D2AF] outline-none placeholder:text-[#F5D2AF]/40"
-          />
+            onChange={setEmail}
+            isRequired
+            validationBehavior="aria"
+            validate={(value) => {
+              const v = value.trim();
+              if (!v) return undefined; // 可选：留空不报错
+              return EMAIL_REGEX.test(v) ? true : "Please enter a valid email address";
+            }}
+            className="mt-4 block text-[#F5D2AF]">
+            <Input
+              placeholder="Email address"
+              variant="primary"
+              className="w-full border border-[#F5D2AF]/40 bg-[#3C5F32] px-3 py-2 text-sm text-[#F5D2AF] outline-none placeholder:text-[#F5D2AF]/40"
+            />
+            <FieldError className="text-[#FF641E]" />
+          </TextField>
+          <TextField type="text" value={name} onChange={setName} className="mt-3 block text-[#F5D2AF]">
+            <Input
+              placeholder="Your name (so I can call you)"
+              className="w-full border border-[#F5D2AF]/40 bg-[#3C5F32] px-3 py-2 text-sm text-[#F5D2AF] outline-none placeholder:text-[#F5D2AF]/40"
+            />
+          </TextField>
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="ghost" size="sm" onPress={onDone} className="text-[#F5D2AF]/60 hover:text-[#FF641E]/90">
               Skip

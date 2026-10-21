@@ -4,12 +4,19 @@ import { TwitchIcon } from "@/components/ui/twitch";
 import { UserMessage } from "@/features/chat-widget/user-message";
 import { AssistantMessage } from "@/features/chat-widget/assistant-message";
 import { useUserProfile } from "@/services/dify/user-profile-store";
+import { useTurnStore } from "@/services/dify/turn-store";
 import TypewriterIntro from "./typewriter-intro";
 import InfoCard from "./info-card";
 import SuggestionList from "./suggestion-list";
 
 import { createDebugLogger } from "@/utils/debug-log";
 const debugLog = createDebugLogger("[chat-messages]");
+
+// 助手消息 wrapper：查询 messageId → turnId 映射并传入 AssistantMessage
+const AssistantMessageWithTurn: FC<{ readonly messageId: string; readonly keyIndex: number }> = ({ messageId, keyIndex }) => {
+  const turnId = useTurnStore((s) => s.messageTurnMap[messageId]);
+  return <AssistantMessage messageId={messageId} turnId={turnId} keyIndex={keyIndex} />;
+};
 
 const ChatMessages: FC = () => {
   const [showCard, setShowCard] = useState(false);
@@ -30,12 +37,13 @@ const ChatMessages: FC = () => {
     setShowCard(false);
     setShowSuggestions(true);
   }, []);
-  debugLog.log(showCard);
   return (
     <div className="relative flex-1 overflow-hidden">
       <ThreadPrimitive.Viewport className="h-full px-4 overflow-y-auto custom-scrollbar" autoScroll>
         <ThreadPrimitive.Messages>
-          {({ message }) => (message.role === "user" ? <UserMessage /> : <AssistantMessage messageId={message.id} />)}
+          {({ message }) => {
+            return message.role === "user" ? <UserMessage /> : <AssistantMessageWithTurn messageId={message.id} keyIndex={message.index} />;
+          }}
         </ThreadPrimitive.Messages>
       </ThreadPrimitive.Viewport>
 

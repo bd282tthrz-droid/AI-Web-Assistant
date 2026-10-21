@@ -1,98 +1,98 @@
+// NodeProgressStore - 进度追踪存储（内存级）
+// 不持久化：数字索引 key 与 Thread 的消息数组同生命周期
+// 跨会话（关闭重开/刷新）历史消息由 NodeProgressPanel 的 isHistory 拦截，不显示节点
+// 持久化反而会让旧会话的数字 key 残留，被新会话相同 index 读到 → 数据污染，故移除
+
 import { create } from "zustand";
+import { createDebugLogger } from "@/utils/debug-log";
 
 type ProgressItem = { title: string; done: boolean };
 
-interface NodeProgressStore {
-  // 按消息ID索引的节点数据 — 唯一存储，实时+持久化合一
-  nodesByMessage: Record<string, ProgressItem[]>;
+// 节点组状态：为每个 messageId 的节点列表添加整组级状态管理
+interface NodeGroupState {
+  nodes: ProgressItem[];
+  isFinished: boolean; // 整组是否已结束
+  finishedAt?: number; // 结束时间戳
+}
 
-  // 当前正在流式的消息ID（由 transport 在 response-metadata 到达时设置）
+interface NodeProgressStore {
+  // 按 key（数字索引 / composite messageId）索引的节点组数据
+  nodesByMessage: Record<string, NodeGroupState>;
+
+  // 当前正在流式的消息 key
   activeMessageId: string | null;
 
-  // 暂存区：response-metadata 到达前收到的节点
-  _pendingBuffer: ProgressItem[];
+  setActiveMessage: (compositeMessageId: string) => void;
 
-  // 当 response-metadata 携带的 ID 确认后，将 pending 数据迁移到 nodesByMessage
-  setActiveMessage: (messageId: string) => void;
-
-  // 添加节点：有 activeMessageId 直接写入 mapping，否则写入 pending
+  // 添加节点
   addNode: (title: string) => void;
 
-  // 标记所有节点完成
+  // 标记整组节点完成
   complete: () => void;
 
-  // 清理当前活动消息的数据（新消息开始时调用）
+  // 清理当前活动消息
   reset: () => void;
+
+  // 获取某组节点的状态
+  getNodeGroup: (messageId: string) => NodeGroupState | undefined;
 }
+
+const debugLog = createDebugLogger("[node-progress-store]");
 
 export const useNodeProgress = create<NodeProgressStore>((set, get) => ({
   nodesByMessage: {},
   activeMessageId: null,
-  _pendingBuffer: [],
 
-  setActiveMessage: (id) => {
-    const { _pendingBuffer, nodesByMessage } = get();
-    if (_pendingBuffer.length > 0) {
-      set({
-        activeMessageId: id,
-        _pendingBuffer: [],
-        nodesByMessage: { ...nodesByMessage, [id]: _pendingBuffer }
-      });
-    } else {
-      set({ activeMessageId: id });
-    }
+  setActiveMessage: (compositeId) => {
+    debugLog.log("[setActiveMessage]", compositeId);
+    set({ activeMessageId: compositeId });
   },
 
   addNode: (title) =>
     set((s) => {
-      const markPreviousDone = (items: ProgressItem[]) => [
-        ...items.map((n) => ({ ...n, done: true })),
-        { title, done: false }
-      ];
+      if (!s.activeMessageId) return {};
 
-      if (s.activeMessageId) {
-        const existing = s.nodesByMessage[s.activeMessageId] ?? [];
-        return {
-          nodesByMessage: {
-            ...s.nodesByMessage,
-            [s.activeMessageId]: markPreviousDone(existing)
+      const existingGroup = s.nodesByMessage[s.activeMessageId];
+      const existingNodes = existingGroup?.nodes ?? [];
+
+      debugLog.log("[addNode]", title);
+      return {
+        nodesByMessage: {
+          ...s.nodesByMessage,
+          [s.activeMessageId]: {
+            nodes: [...(existingNodes?.map((n) => ({ ...n, done: true })) ?? []), { title, done: false }],
+            isFinished: false,
+            finishedAt: undefined
           }
-        };
-      }
-
-      // 还不知道 messageId → 写入 pending
-      return { _pendingBuffer: markPreviousDone(s._pendingBuffer) };
+        }
+      };
     }),
 
   complete: () =>
     set((s) => {
-      if (s.activeMessageId && s.nodesByMessage[s.activeMessageId]) {
-        return {
-          nodesByMessage: {
-            ...s.nodesByMessage,
-            [s.activeMessageId]: s.nodesByMessage[s.activeMessageId].map(
-              (n) => ({ ...n, done: true })
-            )
-          },
-          activeMessageId: null
-        };
-      }
+      if (!s.activeMessageId || !s.nodesByMessage[s.activeMessageId]) return {};
+
+      const currentGroup = s.nodesByMessage[s.activeMessageId];
+      debugLog.log("[complete] marking nodes as done for", s.activeMessageId);
+
       return {
-        _pendingBuffer: s._pendingBuffer.map((n) => ({ ...n, done: true })),
+        nodesByMessage: {
+          ...s.nodesByMessage,
+          [s.activeMessageId]: {
+            ...currentGroup,
+            nodes: currentGroup.nodes.map((n) => ({ ...n, done: true })),
+            isFinished: true,
+            finishedAt: Date.now()
+          }
+        },
         activeMessageId: null
       };
     }),
 
-  reset: () =>
-    set((s) => {
-      if (s.activeMessageId && s.nodesByMessage[s.activeMessageId]) {
-        const { [s.activeMessageId]: _, ...rest } = s.nodesByMessage;
-        return {
-          nodesByMessage: rest,
-          activeMessageId: null,
-          _pendingBuffer: []
-        };
-      }
-      return { activeMessageId: null, _pendingBuffer: [] };
-    })
+  reset: () => {
+    debugLog.log("[reset]");
+    set({ activeMessageId: null });
+  },
+
+  getNodeGroup: (messageId) => get().nodesByMessage[messageId]
 }));

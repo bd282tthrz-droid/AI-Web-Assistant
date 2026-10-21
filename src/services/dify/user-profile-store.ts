@@ -6,7 +6,7 @@ import { create } from "zustand";
 
 const STORAGE_KEY = "ai-assist-user-profile";
 
-interface UserProfile {
+export interface UserProfile {
   readonly email?: string;
   readonly name?: string;
   readonly phone?: string;

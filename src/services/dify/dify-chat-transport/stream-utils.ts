@@ -25,7 +25,7 @@ export const buildDifyInputs = (): Record<string, string> => {
   return {
     ...contextInputs,
     tools: TOOL_DEFINITIONS_JSON,
-    dev: dev ?? APP_ENV.DIFY_DEV,
+    dev: dev ?? APP_ENV.DIFY_DEV
   };
 };
 
@@ -97,6 +97,7 @@ export const createDedupTransform = (logger: DebugLogger) => {
   return new TransformStream<TextStreamPart<any>, TextStreamPart<any>>({
     transform(chunk, controller) {
       // 对 finish-step 去重（避免两次 finish）
+      // logger.log("[createDedupTransform]", chunk);
       if (chunk.type === "finish-step") {
         if (hasFinished) return;
         hasFinished = true;
@@ -108,7 +109,7 @@ export const createDedupTransform = (logger: DebugLogger) => {
       if (chunk.type === "tool-input-start") {
         if (hasSeenAnyToolStart) {
           duplicateToolCallIds.add(chunk.id);
-          logger.log("[dedup] duplicate tool-input-start skipped:", chunk.toolName, "id:", chunk.id.slice(0, 8));
+          //  logger.log("[dedup] duplicate tool-input-start skipped:", chunk.toolName, "id:", chunk.id.slice(0, 8));
           return;
         }
         hasSeenAnyToolStart = true;
@@ -130,7 +131,7 @@ export const createDedupTransform = (logger: DebugLogger) => {
       if (chunk.type === "tool-call") {
         const key = `${chunk.toolName}:${JSON.stringify(chunk.input)}`;
         if (seenToolCallKeys.has(key)) {
-          logger.log("[dedup] duplicate tool-call skipped:", chunk.toolName);
+          //logger.log("[dedup] duplicate tool-call skipped:", chunk.toolName);
           return;
         }
         seenToolCallKeys.add(key);

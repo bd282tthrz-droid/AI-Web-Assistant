@@ -4,6 +4,8 @@ import FabButton from "./fab-button";
 import ChatDialogPanel from "./chat-dialog-panel";
 import MouseHint from "./mouse-hint";
 import FormHint from "./form-hint";
+import PageSummaryHint from "./page-summary-hint";
+import { useSummaryStore } from "./page-summary-store";
 import { FormFillProvider } from "./form-fill-context";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { useNewMessageStore } from "@/services/dify/new-message-store";
@@ -19,6 +21,7 @@ const ChatWidget: FC = () => {
   const [isOpen, setIsOpen] = useState(!APP_ENV.IS_DEV);
   const [isMinimized, setIsMinimized] = useState(false);
   const [pendingFormType, setPendingFormType] = useState<string | null>(null);
+  const [formFillSeq, setFormFillSeq] = useState(0);
   const badgeCount = useNewMessageStore((s) => s.count);
 
   const handleToggle = useCallback(() => {
@@ -41,8 +44,19 @@ const ChatWidget: FC = () => {
   const handleFormOpen = useCallback((formType?: string) => {
     useNewMessageStore.getState().reset();
     setPendingFormType(formType ?? null);
+    // 每次点击递增触发序号，保证重复点击同一类型也能触发 composer 预填充
+    setFormFillSeq((s) => s + 1);
     setIsMinimized(false);
     setIsOpen(true);
+  }, []);
+
+  const handleSummaryOpen = useCallback(() => {
+    // 打开对话框 + 递增总结请求序号（SummaryRequestTrigger 监听后自动发送）
+    useNewMessageStore.getState().reset();
+    setPendingFormType(null);
+    setIsMinimized(false);
+    setIsOpen(true);
+    useSummaryStore.getState().request();
   }, []);
 
   const handleMinimize = useCallback(() => {
@@ -68,6 +82,8 @@ const ChatWidget: FC = () => {
       {!isOpen && !isMinimized && <MouseHint onOpen={handleOpen} />}
       {/* 核心已加载后，始终显示表单悬停提示 */}
       <FormHint onOpen={handleFormOpen} />
+      {/* 正文悬停时显示 "Summarize page" 浮标（与 MouseHint 协调，正文区域接管） */}
+      <PageSummaryHint onSummarize={handleSummaryOpen} />
       {/* 对话框 - 最小化时不卸载，仅 hidden */}
       <AnimatePresence>
         {(isOpen || isMinimized) && (
@@ -80,7 +96,7 @@ const ChatWidget: FC = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.5, y: 40 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}>
-            <FormFillProvider value={pendingFormType}>
+            <FormFillProvider value={{ label: pendingFormType, seq: formFillSeq }}>
               <ChatDialogPanel onClose={handleClose} onMinimize={handleMinimize} />
             </FormFillProvider>
           </motion.div>

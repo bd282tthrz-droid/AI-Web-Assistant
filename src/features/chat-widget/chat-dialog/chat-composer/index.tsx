@@ -8,7 +8,7 @@ import SubmitButton from "./submit-button";
 const ChatComposer: FC = () => {
   const history = unstable_useComposerInputHistory();
   const aui = useAui();
-  const fieldLabel = useFormFill();
+  const { label: fieldLabel, seq } = useFormFill();
 
   useEffect(() => {
     if (fieldLabel) {
@@ -31,7 +31,8 @@ const ChatComposer: FC = () => {
         // composer 尚未初始化，忽略
       }
     }
-  }, [fieldLabel]);
+    // seq 每次点击自动填写递增，保证重复点击同一类型也能重新填充
+  }, [fieldLabel, seq]);
 
   return (
     <>

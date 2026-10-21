@@ -58,7 +58,12 @@ export const useConversationHistory = (): {
 
         const id = `${conversationId}:${row.id ?? index}:${role}`;
         messages.push({
-          message: { id, role, parts: [{ type: "text", text }] } as UIMessage,
+          message: {
+            id,
+            role,
+            parts: [{ type: "text", text }],
+            metadata: { custom: { isHistory: true } }
+          } as UIMessage,
           parentId
         });
         parentId = id;

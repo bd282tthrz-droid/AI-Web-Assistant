@@ -4,15 +4,17 @@
 
 import { useEffect } from "react";
 import { useAuiState } from "@assistant-ui/store";
-import { useNodeProgress } from "@/services/dify/node-progress-store";
 import { useStoppedState } from "@/services/dify/stopped-state";
+import { createDebugLogger } from "@/utils/debug-log";
 
+const debugLog = createDebugLogger("useMessageRunState");
 export const useMessageRunState = () => {
   const isRunning = useAuiState((s) => s.thread.isRunning);
 
   useEffect(() => {
     if (isRunning) {
-      useNodeProgress.getState().reset();
+      debugLog.log("[useMessageRunState] isRunning", isRunning);
+      //useNodeProgress.getState().reset();
       useStoppedState.getState().set(false);
     }
   }, [isRunning]);

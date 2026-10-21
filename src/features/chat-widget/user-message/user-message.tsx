@@ -11,10 +11,8 @@ const UserMessage: FC = () => {
   const { copy, isCopied } = useActionBarCopy({
     copyToClipboard: async (text: string) => {
       await navigator.clipboard.writeText(text);
-    },
+    }
   });
-
-  debugLog.log("UserMessage");
   return (
     <MessagePrimitive.Root className="flex flex-col items-end mt-6">
       <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-[#FF641E]/85 px-4 py-2.5 text-sm text-white shadow-sm backdrop-blur-sm">

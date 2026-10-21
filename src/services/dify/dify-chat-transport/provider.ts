@@ -1,7 +1,7 @@
 import { createDifyProvider } from "dify-ai-provider";
 import { DIFY_CONFIG } from "@/constants/api";
 import { createDebugLogger } from "@/utils/debug-log";
-import { wfError } from "../dify-error-state";
+import { getCurrentTurnId, useTurnStore } from "../turn-store";
 import { useNodeProgress } from "../node-progress-store";
 
 // 从 DIFY_CHAT_MESSAGES 端点 URL 提取 base URL（与旧代码使用同一端点）
@@ -30,13 +30,14 @@ export const difyProvider = createDifyProvider({
       // 网络错误（CORS、DNS、连接拒绝等），fetch 无 response 对象
       debugLog.log("fetch error:", err);
       const msg = err instanceof TypeError ? `Network error: ${err.message}` : `Request failed: ${err}`;
-      wfError.set(msg);
+      const fetchTurnId = getCurrentTurnId();
+      if (fetchTurnId) useTurnStore.getState().setError(fetchTurnId, msg);
       throw err;
     }
     // 捕获 HTTP 错误（401/500 等），触发错误卡片
     if (!response.ok) {
       const errBody = await response.text().catch(() => "");
-      wfError.set(`Dify API error (${response.status}): ${errBody.slice(0, 200)}`);
+      useTurnStore.getState().setError(getCurrentTurnId() ?? "", `Dify API error (${response.status}): ${errBody.slice(0, 200)}`);
     }
     if (!response.body) return response;
 
@@ -70,8 +71,9 @@ export const difyProvider = createDifyProvider({
               if (line.startsWith("data:")) {
                 try {
                   const evt = JSON.parse(line.slice(5).trim());
-                  debugLog.log("[node_started]", evt.data?.title);
+                  // node_started 添加进度节点
                   if (evt.event === "node_started" && evt.data?.title) {
+                    //debugLog.log("[node_started]", evt.data?.title);
                     useNodeProgress.getState().addNode(evt.data.title);
                   }
                   // 工作流完成/失败时标记节点完成
@@ -85,7 +87,7 @@ export const difyProvider = createDifyProvider({
                         conversation_id: evt.conversation_id ?? ""
                       });
                       controller.enqueue(encoder.encode(`data: ${fake}\n\n`));
-                      wfError.set(evt.data.error ?? "Workflow execution failed");
+                      useTurnStore.getState().setError(getCurrentTurnId() ?? "", evt.data.error ?? "Workflow execution failed");
                       debugLog.log("[workflow_failed]", evt.data.error);
                     }
                   }

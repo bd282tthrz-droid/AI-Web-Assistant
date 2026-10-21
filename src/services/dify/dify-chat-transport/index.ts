@@ -4,9 +4,10 @@ import { z } from "zod";
 import { getConversationId, getVisitorId, setConversationId, saveToHistory } from "../dify-conversation";
 import { toolkit } from "@/features/action-executor/toolkit";
 import { DIFY_CONFIG } from "@/constants/api";
+import { MESSAGE_TYPE_PAGE_SUMMARY, METADATA_PAGE_SUMMARY } from "@/constants/page-summary";
 import { createDebugLogger } from "@/utils/debug-log";
-import { wfError } from "../dify-error-state";
 import { useNodeProgress } from "../node-progress-store";
+import { useTurnStore } from "../turn-store";
 import { useStoppedState } from "../stopped-state";
 import { useDifyMessageStore } from "../dify-message-store";
 import { useNewMessageStore } from "../new-message-store";
@@ -38,6 +39,15 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
     } & ChatRequestOptions
   ): Promise<ReadableStream<UIMessageChunk>> {
     const { messages, abortSignal, headers } = options;
+    // 开启新一轮：生成前端唯一 turnId（错误状态按轮关联）
+    const turnId = useTurnStore.getState().startTurn();
+
+    useNodeProgress.getState().setActiveMessage(messages.length.toString());
+
+    // 识别页面总结请求：最后一条 user 消息带 metadata.custom.type 标记
+    const lastUserMessage = [...messages].reverse().find((m) => m.role === "user");
+    const lastUserMetadata = lastUserMessage?.metadata as { custom?: { type?: string } } | undefined;
+    const isSummaryRequest = lastUserMetadata?.custom?.type === MESSAGE_TYPE_PAGE_SUMMARY;
 
     try {
       // 消息格式转换
@@ -156,9 +166,10 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
         new TransformStream<TextStreamPart<any>, TextStreamPart<any>>({
           transform(chunk, controller) {
             const c = chunk as unknown as { type: string; id?: string };
-            if (c.type === "response-metadata" && c.id) {
+            if (c.type === "start" && c.id) {
               capturedResponseId = c.id;
-              useNodeProgress.getState().setActiveMessage(c.id);
+              // 绑定 messageId → turnId（渲染侧 ErrorPanel 通过 messageId 查 turnId）
+              useTurnStore.getState().bindMessageId(c.id, turnId);
             }
             controller.enqueue(chunk);
           }
@@ -166,7 +177,9 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
       );
 
       const uiMessageStream = toUIMessageStream({
-        stream: idCaptureStream
+        stream: idCaptureStream,
+        // 页面总结请求 → 在回复消息 metadata 注入 pageSummary 标记（前端据此渲染询价卡片）
+        messageMetadata: isSummaryRequest ? () => ({ custom: { [METADATA_PAGE_SUMMARY]: true } }) : undefined,
       });
 
       // 异步提取并保存 conversationId 和 messageId 映射
@@ -179,6 +192,7 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
             saveToHistory(conversationId, "");
           }
           const difyMessageId = difyWorkflowData?.messageId;
+          debugLog.log("[conversationId] extraction:", conversationId, difyMessageId, capturedResponseId);
           if (difyMessageId && capturedResponseId) {
             useDifyMessageStore.getState().setDifyId(capturedResponseId, difyMessageId);
           }
@@ -190,7 +204,7 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
           if (isUserCancel) return;
           const errorText = err instanceof Error ? err.message : "Request failed, please try again later";
           debugLog.error("[conversationId] extraction failed:", err);
-          wfError.set(errorText);
+          useTurnStore.getState().setError(turnId, errorText);
         }
       );
 
@@ -204,7 +218,7 @@ export class DifyChatTransport implements ChatTransport<UIMessage> {
       }
       const errorText = err instanceof Error ? err.message : "Request failed, please try again later";
       debugLog.error("sendMessages error:", errorText);
-      wfError.set(errorText);
+      useTurnStore.getState().setError(turnId, errorText);
       return createErrorStream(`[Error] ${errorText}`);
     }
   }

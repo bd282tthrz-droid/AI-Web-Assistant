@@ -1,16 +1,21 @@
-import { useState, useEffect, type FC } from "react";
+import { type FC } from "react";
 import { ErrorPrimitive } from "@assistant-ui/react";
-import { wfError } from "@/services/dify/dify-error-state";
+import { useAuiState } from "@assistant-ui/store";
+import { useTurnStore } from "@/services/dify/turn-store";
 
-const ErrorPanel: FC = () => {
-  const [error, setError] = useState<string | null>(null);
+interface ErrorPanelProps {
+  readonly turnId?: string;
+}
 
-  useEffect(() => {
-    const unsub = wfError.subscribe(setError);
-    return () => {
-      unsub();
-    };
-  }, []);
+// 错误面板：按 turnId 显示本轮错误（历史消息通过 messageTurnMap 查到自己那轮的错误）
+const ErrorPanel: FC<ErrorPanelProps> = ({ turnId }) => {
+  const currentTurnId = useTurnStore((s) => s.currentTurnId);
+  const errors = useTurnStore((s) => s.errors);
+  const isLast = useAuiState((s) => s.message.isLast);
+
+  // 优先用 props 传入的 turnId；网络错误（无映射）时 isLast 兜底为当前轮
+  const effectiveTurnId = turnId ?? (isLast ? currentTurnId : undefined);
+  const error = effectiveTurnId ? errors[effectiveTurnId] : undefined;
 
   if (!error) return null;
 

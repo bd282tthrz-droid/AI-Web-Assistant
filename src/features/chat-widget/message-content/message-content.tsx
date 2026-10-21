@@ -3,9 +3,11 @@ import { useAuiState } from "@assistant-ui/store";
 import { type FC } from "react";
 import { StreamingText } from "@/components/assistant-ui/elements/streaming-text";
 import Thinking from "@/components/thinking";
+import { createDebugLogger } from "@/utils/debug-log";
 
 // ── UserText ──
 // 模块级命名组件，引用稳定，不被 MessagePrimitive.Parts 反复卸载/挂载
+const debugLog = createDebugLogger("[MessageContent]");
 
 const UserText: FC = () => (
   <div className="pre-line-clamp-2">

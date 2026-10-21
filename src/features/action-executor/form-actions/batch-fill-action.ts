@@ -50,7 +50,11 @@ export const batchFillFields = async (params: BatchFillParams): Promise<ActionRe
     });
 
     if (!fillResult.success) {
-      results.push({ field: resolved.element.id || resolved.element.name || "unknown", success: false });
+      results.push({
+        field: resolved.element.id || resolved.element.getAttribute("name") || "unknown",
+        success: false,
+        error: fillResult.error ?? fillResult.message ?? "unknown",
+      });
       hasError = true;
       continue;
     }
@@ -58,7 +62,7 @@ export const batchFillFields = async (params: BatchFillParams): Promise<ActionRe
     // 3. 动画反馈
     await animateFill(resolved.element);
 
-    results.push({ field: resolved.element.id || resolved.element.name || "unknown", success: true });
+    results.push({ field: resolved.element.id || resolved.element.getAttribute("name") || "unknown", success: true });
   }
 
   const filledCount = results.filter((r) => r.success).length;

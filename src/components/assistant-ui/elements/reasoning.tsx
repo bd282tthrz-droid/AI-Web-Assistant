@@ -38,7 +38,7 @@ export type ReasoningRootProps = Omit<React.ComponentProps<typeof Collapsible>, 
      * streaming, even after a manual toggle, and pauses while the reader is
      * scrolled up.
      */
-    streaming?: boolean;
+    active?: boolean;
     /** Called right before the disclosure animates, on toggle and on streaming transitions. */
     onAnimationStart?: () => void;
   };
@@ -49,7 +49,7 @@ function ReasoningRoot({
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
   defaultOpen = false,
-  streaming,
+  active,
   onAnimationStart,
   children,
   ...props
@@ -58,19 +58,19 @@ function ReasoningRoot({
   const [userOpen, setUserOpen] = useState<boolean | null>(null);
 
   const isControlled = controlledOpen !== undefined;
-  const isOpen = isControlled ? controlledOpen : userOpen ?? (streaming || initialOpen);
-  const isPreview = streaming === true && isOpen;
+  const isOpen = isControlled ? controlledOpen : userOpen ?? (active || initialOpen);
+  const isPreview = active === true && isOpen;
 
-  const prevStreamingRef = useRef(streaming);
+  const prevActiveRef = useRef(active);
   useLayoutEffect(() => {
-    if (prevStreamingRef.current === streaming) return;
-    prevStreamingRef.current = streaming;
+    if (prevActiveRef.current === active) return;
+    prevActiveRef.current = active;
     // A streaming transition only animates the panel when the resting state
     // is collapsed; with `defaultOpen` the disclosure stays open across it.
     if (!isControlled && userOpen === null && !initialOpen) {
       onAnimationStart?.();
     }
-  }, [streaming, isControlled, userOpen, initialOpen, onAnimationStart]);
+  }, [active, isControlled, userOpen, initialOpen, onAnimationStart]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {

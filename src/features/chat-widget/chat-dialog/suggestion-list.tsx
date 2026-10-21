@@ -2,12 +2,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ThreadPrimitive } from "@assistant-ui/react";
 import { type FC } from "react";
 import { getSuggestions } from "@/constants/suggestion";
+import { createDebugLogger } from "@/utils/debug-log";
 
 interface SuggestionListProps {
   readonly visible: boolean;
 }
-
+const debugLog = createDebugLogger("[suggestion-list]");
 const SuggestionList: FC<SuggestionListProps> = ({ visible }) => {
+  debugLog.log("[SuggestionList]", visible);
   return (
     <AnimatePresence>
       {visible && (
