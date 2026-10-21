@@ -9,6 +9,9 @@ const MOUNT_ID = "web-assistant-mount";
 const PORTAL_ID = "confirm-portal";
 const CORE_LOADED_FLAG = "__web_assistant_core_loaded";
 
+// 核心包版本（与 package.json 同步，发布新版本时更新；用于 core 资源 URL ?v= 强破缓存）
+const CORE_VERSION = "0.0.18";
+
 // 在模块顶层捕获脚本 URL（同步 <script> 执行时 document.currentScript 可靠）
 const scriptSrc = (document.currentScript as HTMLScriptElement | null)?.src ?? "";
 const baseUrl = scriptSrc ? scriptSrc.replace(/\/[^/]+\.js$/, "/") : "";
@@ -135,14 +138,14 @@ const init = () => {
     shadowRoot.replaceChild(loader, fabButton);
 
     // 加载核心 CSS
-    const cssUrl = baseUrl + "web-assistant-core.umd.css";
+    const cssUrl = baseUrl + `web-assistant-core.umd.css?v=${CORE_VERSION}`;
     const linkEl = document.createElement("link");
     linkEl.rel = "stylesheet";
     linkEl.href = cssUrl;
     shadowRoot.appendChild(linkEl);
 
     // 加载核心 JS
-    const jsUrl = baseUrl + "web-assistant-core.umd.js";
+    const jsUrl = baseUrl + `web-assistant-core.umd.js?v=${CORE_VERSION}`;
     const scriptEl = document.createElement("script");
     scriptEl.src = jsUrl;
     scriptEl.onload = () => {
